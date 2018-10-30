@@ -37,7 +37,7 @@ nb_materials = max(max(indian_pines_gt)); mat = tens2mat(SRI,3,[]);
 
 F = 100;
 [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-[~,~,~,SRIh_S, ~] = stereo3(1, F, A0,B0,C0,SRI, HSI, MSI, P1,P2,Pm, 10);
+[~,~,~,SRIh_S] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
 
 filename1 = sprintf('data_exp1_%d_%d_%d_IP',R1(1),R1(2),R1(3)); 
 filename2 = sprintf('data_exp1_%d_%d_%d_IP',R2(1),R2(2),R2(3));

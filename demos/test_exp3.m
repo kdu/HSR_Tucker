@@ -27,16 +27,20 @@ R1 = [40,40,6]; R2 = [30,30,16]; R3 = [24,24,25];
 
 % F = 20;
 % [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-% [~,~,~,Sa, erra] = stereo3(1, F, A0,B0,C0,SRI, HSI, MSI, P1,P2,Pm, 10);
+% [~,~,~,Sa] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
+% erra = {nmse(SRI,Sa), SAM(SRI,Sa), ergas(SRI,Sa), r_snr(SRI,Sa), cc(SRI,Sa)};
 % F = 30;
 % [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-% [~,~,~,Sb, errb] = stereo3(1, F, A0,B0,C0,SRI, HSI, MSI, P1,P2,Pm, 10);
+% [~,~,~,Sb] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
+% errb = {nmse(SRI,Sb), SAM(SRI,Sb), ergas(SRI,Sb), r_snr(SRI,Sb), cc(SRI,Sb)};
 F = 50;
 [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-[~,~,~,S0, err0] = stereo3(1, F, A0,B0,C0,SRI, HSI, MSI, P1,P2,Pm, 10);
+[~,~,~,S0] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
+err0 = {nmse(SRI,S0), SAM(SRI,S0), ergas(SRI,S0), r_snr(SRI,S0), cc(SRI,S0)};
 F = 100;
 [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-[~,~,~,S1, err1] = stereo3(1, F, A0,B0,C0,SRI, HSI, MSI, P1,P2,Pm, 10);
+[~,~,~,S1] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
+err1 = {nmse(SRI,S1), SAM(SRI,S1), ergas(SRI,S1), r_snr(SRI,S1), cc(SRI,S1)};
 
 [S2,~, err2] = run_hosvd(SRI,MSI,HSI,R1,P1,P2,Pm);
 [S3,~, err3] = run_hosvd(SRI,MSI,HSI,R2,P1,P2,Pm);
@@ -47,7 +51,7 @@ F = 100;
 
 %% MAKE TABLE FROM RESULTS
 
-errH = load('metrics_hs_ip');
+errH = load('metrics_hs_ip'); %This is obtained from Hysure and it must contain the same metrics
 
  T2 = [% real([erra{4}(end) erra{1}(end) erra{5}(end) erra{2}(end) erra{3}(end)]);
 %     real([errb{4}(end) errb{1}(end) errb{5}(end) errb{2}(end) errb{3}(end)]);
