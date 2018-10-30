@@ -1,4 +1,4 @@
-%% README.txt -î A guide for the HSR package %%
+%% README.txt -‚Äù A guide for the HSR package %%
 
 Link to the datasets (Indian Pines and Salinas): http://www.ehu.eus/ccwintco/index.php/Hyperspectral_Remote_Sensing_Scenes
 Link to the TensorLab toolbox for MATLAB: https://www.tensorlab.net
@@ -15,8 +15,6 @@ Link to the HySure package: https://github.com/alfaiate/HySure/tree/master/src
 RUN ONE OF THESE TO GET RESULTS 
 
 ../utils contains:
-	bartelsStewart.m: solves generalized Sylvester equation via Bartels-Stewart algorithm.
-
 	crop.m: crops data to the specified dimensions
 
 	gauss_kernel.m: Creates 1D gaussian filter with specified size and parameter sigma
