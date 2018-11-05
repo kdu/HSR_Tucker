@@ -1,4 +1,4 @@
-function [SRI_hat,cost, err] = run_hosvd_blind(SRI,MSI,HSI,R,P1,P2,Pm, alpha)
+function [SRI_hat,info] = bscott(HSI, MSI, ranks, Pm, opts)
 
 % RUN_HOSVD runs the HOSVD algorithm for specified rank R
 % [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 
@@ -17,21 +17,22 @@ function [SRI_hat,cost, err] = run_hosvd_blind(SRI,MSI,HSI,R,P1,P2,Pm, alpha)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-tic,
-[fact,S] = mlsvd(MSI, R); % hosvd
-U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
-[W_H, ~, ~] = svds(tens2mat(HSI,3,[]), R(3));
-T = (Pm * W_H) \ W_tilde;
+if nargin==6
+    Display = 'false';
+elseif nargin==7
+    Display = opts.Display;
+end
 
-lam = 1;
+[fact,S] = mlsvd(MSI, ranks); % hosvd
+U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
+[W_H, ~, ~] = svds(tens2mat(HSI,3,[]), ranks(3));
+T = (Pm * W_H) \ W_tilde;
 
 W = W_H * T;
 SRI_hat = lmlragen({U,V,W},S); 
-time = toc
-
-cost = frob(HSI - lmlragen({P1*U,P2*V,W}, S),'squared') + frob(MSI - lmlragen({U,V,Pm*W},S),'squared');
-err = {cost nmse(SRI,SRI_hat), cc(SRI,SRI_hat), sam(SRI,SRI_hat), ergas(SRI,SRI_hat,1/4), r_snr(SRI,SRI_hat), time};
-%err = r_snr(SRI,SRI_hat);
+info.factors = {'U','V','W'};
+info.core = {'S'};
+info.rank = {'ranks'};
 
 end
 
