@@ -1,67 +1,62 @@
-function [A,B,C, SRI_hat, err, cost] = stereo(lambda, F, A0,B0,C0,SRI, HSI, MSI, P1,P2,Pm, Niter)
+function [SRI_hat, info] = stereo(HSI, MSI, P1, P2, Pm, ranks, opts)
 
 % STEREO provides estimation of SRI with an AO algorithm
-% [A,B,C, SRI_hat] = STEREO(lambda, F, A0,B0,C0, HSI, MSI, P1,P2,Pm,Niter) returns
+% [SRI_hat, info] = STEREO(HSI, MSI, P1, P2, Pm, ranks, opts) returns
 % SRI_hat = [A,B,C] from HSI and MSI
 % 
 % INPUT ARGUMENTS:
-%     lambda: weighting argument between HSI and MSI
 %     F: tensor rank of estimation
-%     A0,B0,C0: factor matrices obtained from initialization TENREC
 %     HSI, MSI: lower-resolution images
 %     P1,P2,Pm: degradation matrices
-%     Niter: number of iterations (optional)
+%     opts: structure containing parameters
 % OUTPUT ARGUMENTS:
-%     A,B,C: factor matrices for CPD of estimation
 %     SRI_hat: estimation of SRI such that SRI_hat = [A,B,C]
-%     err: structure containing NMSE, SAM, ERGAS, R-SNR, CC, CPU TIME
+%     info: informative structure about the method
 % 
 % SEE ALSO: TENREC
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
+if nargin==6
+    lambda = 1; Niter = 10; opts.CPD_Niter = 25; Display = 'false';
+    [A, B, ~,~, C] = tenRec(MSI, HSI, P1, P2, Pm, ranks, opts);
+elseif nargin==7
+    lambda = opts.lambda; Niter = opts.Niter; Display = opts.Display;
+    A = opts.factors{1}; B = opts.factors{2}; C = opts.factors{3};
+end
 
-A = A0; B = B0; C = C0; opts.POSDEF = true; opts.SYM = true;
+opts2.POSDEF = true; opts2.SYM = true;
 
 Yh1 = tens2mat(HSI,[],1); Yh2 = tens2mat(HSI,[],2); Yh3 = tens2mat(HSI,[],3);
 Ym1 = tens2mat(MSI,[],1); Ym2 = tens2mat(MSI,[],2); Ym3 = tens2mat(MSI,[],3);
-
-cost_A = []; cost_B = []; cost_C = [];
 
 for n = 1:Niter
     
     disp('A...')
     R = lambda*Ym1'*kr(Pm*C,B) + P1'*Yh1'*kr(C,P2*B);
     Q = lambda*kron(((Pm*C)'*(Pm*C)).*(B'*B), eye(size(P1,2))) + kron((C'*C).*((P2*B)'*(P2*B)), P1'*P1);
-    A = reshape(linsolve(Q, R(:), opts),[size(P1,2) F]);
-    %A = reshape(Q\R(:),[size(P1,2) F]);
+    A = reshape(linsolve(Q, R(:), opts2),[size(P1,2) ranks]);
+    %A = reshape(Q\R(:),[size(P1,2) ranks]);
     
     disp('B...')
-    
     R = lambda*Ym2'*kr(Pm*C,A) + P2'*Yh2'*kr(C,P1*A);
     Q = lambda*kron(((Pm*C)'*(Pm*C)).*(A'*A), eye(size(P2,2))) + kron((C'*C).*((P1*A)'*(P1*A)), P2'*P2);
-    B = reshape(linsolve(Q, R(:), opts),[size(P2,2) F]);
-    %B = reshape(Q\R(:),[size(P2,2) F]);
+    B = reshape(linsolve(Q, R(:), opts2),[size(P2,2) ranks]);
+    %B = reshape(Q\R(:),[size(P2,2) ranks]);
     
     disp('C...')
     R = lambda*Pm'*Ym3'*kr(B,A) + Yh3'*kr(P2*B,P1*A);
     Q = lambda*kron((B'*B).*(A'*A), Pm'*Pm) + kron(((P2*B)'*(P2*B)).*((P1*A)'*(P1*A)), eye(size(Pm,2)));
-    C = reshape(linsolve(Q, R(:), opts),[size(Pm,2) F]);
-    %C = reshape(Q\R(:),[size(Pm,2) F]);
-    
-    SRI_hat = cpdgen({A,B,C});
-    mse = nmse(SRI, SRI_hat);
-s = sam(SRI, SRI_hat);
-glob_err = ergas(SRI, SRI_hat,1/8);
-snr = r_snr(SRI, SRI_hat);
-crossco = cc(SRI, SRI_hat);
+    C = reshape(linsolve(Q, R(:), opts2),[size(Pm,2) ranks]);
+    %C = reshape(Q\R(:),[size(Pm,2) ranks]);
     
 end
 
-
-err = {mse, s, glob_err, snr, crossco}; cost = {cost_A, cost_B, cost_C};
-
+SRI_hat = cpdgen({A,B,C});
+info.factors = {'A','B','C'};
+info.rank = {'ranks'};
+info.Niter = {'Niter'};
 
 end
 

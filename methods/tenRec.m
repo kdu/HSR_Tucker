@@ -1,4 +1,4 @@
-function [A, B, A_tilde, B_tilde, C] = tenRec(DATA, HSI, F, P1,P2,Pm)
+function [A, B, A_tilde, B_tilde, C] = tenRec(MSI, HSI, P1, P2, Pm, ranks, opts)
 
 % TENREC initialization of STEREO
 % [A_tilde, B_tilde, C] = TENREC(DATA, F, P1,P2,Pm) performs CPD of DATA 
@@ -22,8 +22,8 @@ function [A, B, A_tilde, B_tilde, C] = tenRec(DATA, HSI, F, P1,P2,Pm)
 % Contact: clemence.prevost@univ-lorraine.fr
 
 
-options.MaxIter = 25; %options.Display = true;
-U = cpd(DATA,F,options);
+options.MaxIter = opts.CPD_Niter; %options.Display = true;
+U = cpd(MSI,ranks,options);
 A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));
 
 A_tilde = P1*A; B_tilde = P2*B; 
