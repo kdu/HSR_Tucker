@@ -12,7 +12,7 @@ SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption (Indian pines)
 SRI(1,:,:) = []; SRI(:,1,:) = [];
 % 
-Pm = spectral_deg(SRI);
+Pm = spectral_deg(SRI,1);
 MSI = tmprod(SRI,Pm,3);
  
 d1 = 4; d2 = 4; q = 9;

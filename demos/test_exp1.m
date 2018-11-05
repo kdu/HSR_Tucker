@@ -23,7 +23,7 @@
 SRI = cell2mat(struct2cell(load('Salinas.mat')));
 SRI = crop(SRI,[80,84,size(SRI,3)]);
 SRI(:,:,[108:112 154:167 224]) = []; %Regions of water absorption (Salinas)
-Pm = spectral_deg(SRI);
+Pm = spectral_deg(SRI,1);
 MSI = tmprod(SRI,Pm,3);
 d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);

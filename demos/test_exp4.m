@@ -29,7 +29,7 @@ for i=1:length(R1)
         %[SRI_hat,cost, snr] = run_sdf(MSI, HSI, SRI ,R,options,P1,P2,Pm);
         [SRI_hat,cost, err] = run_hosvd(SRI,MSI,HSI,R,P1,P2,Pm, alpha);
         snr = err{6};
-        save(filename,'SRI_hat','cost','snr');
+        %save(filename,'SRI_hat','cost','snr');
     end
 end
 
