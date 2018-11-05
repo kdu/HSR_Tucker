@@ -1,4 +1,4 @@
-function [A, B, A_tilde, B_tilde, C] = tenRec(MSI, HSI, P1, P2, Pm, ranks, opts)
+function [A, B, A_tilde, B_tilde, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks, opts)
 
 % TENREC initialization of STEREO
 % [A_tilde, B_tilde, C] = TENREC(DATA, F, P1,P2,Pm) performs CPD of DATA 

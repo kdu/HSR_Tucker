@@ -1,4 +1,4 @@
-function [SRI_hat, info] = run_hosvd(HSI, MSI, P1, P2, Pm, ranks, opts)
+function [SRI_hat, info] = scott(HSI, MSI, P1, P2, Pm, ranks, opts)
 
 % RUN_HOSVD runs the HOSVD algorithm for specified rank R
 % [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 

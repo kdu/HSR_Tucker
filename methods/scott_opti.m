@@ -1,4 +1,4 @@
-function [SRI_hat,info] = run_sdf(HSI, MSI, P1, P2, Pm, ranks, opts)
+function [SRI_hat,info] = scott_opti(HSI, MSI, P1, P2, Pm, ranks, opts)
 
 % RUN_SDF runs the HOSVD algorithm for specified rank R followed by 
 % TensorLab optimization
