@@ -1,4 +1,4 @@
-function [SRI_hat,cost, err] = run_hosvd(SRI,MSI,HSI,R,P1,P2,Pm, alpha)
+function [SRI_hat, info] = run_hosvd(HSI, MSI, P1, P2, Pm, ranks, opts)
 
 % RUN_HOSVD runs the HOSVD algorithm for specified rank R
 % [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 
@@ -17,13 +17,16 @@ function [SRI_hat,cost, err] = run_hosvd(SRI,MSI,HSI,R,P1,P2,Pm, alpha)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-tic 
+if nargin==6
+    lambda = 1; Display = 'false'; alpha = 0;
+elseif nargin==7
+    lambda = opts.lambda; Display = opts.Display; alpha = opts.alpha;
+end
 
-[U, ~, ~] = svds(tens2mat(MSI,1,[]),R(1));
-[V, ~, ~] = svds(tens2mat(MSI,2,[]),R(2));
-[W, ~, ~] = svds(tens2mat(HSI,3,[]), R(3));
+[U, ~, ~] = svds(tens2mat(MSI,1,[]),ranks(1));
+[V, ~, ~] = svds(tens2mat(MSI,2,[]),ranks(2));
+[W, ~, ~] = svds(tens2mat(HSI,3,[]), ranks(3));
 
-lam = 1;
 %%%%%%%%%%%%%%%%%%%
 % ALWAYS WORKS BUT SLOWER  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,21 +39,15 @@ lam = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
-B = lam* W'*(Pm'*Pm)*W;
-b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lam * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
-C = reshape(b_old, R(1)*R(2), R(3));
-S = reshape(sylvester(A,B,C),R);
-
-%%%%%%%%%%%
-% IF REGULARIZATION %
-%%%%%%%%%%%%%%%%%%%%%
-%S = reshape((A + alpha*norm(A,2)^2*ones(size(A,2)))\ b(:),R); %alpha = regularization weight
+B = lambda* W'*(Pm'*Pm)*W;
+b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+C = reshape(b_old, ranks(1)*ranks(2), ranks(3));
+S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),B,C),ranks);
 
 SRI_hat = lmlragen({U,V,W},S);
-time = toc 
-cost = frob(HSI - lmlragen({P1*U,P2*V,W}, S),'squared') + frob(MSI - lmlragen({U,V,Pm*W},S),'squared');
-err = {cost nmse(SRI,SRI_hat), cc(SRI,SRI_hat), sam(SRI,SRI_hat), ergas(SRI,SRI_hat,1/4), r_snr(SRI,SRI_hat),time};
-%err = r_snr(SRI,SRI_hat);
+info.factors = {'U','V','W'};
+info.core = {'S'};
+info.rank = {'ranks'};
 
 end
 
