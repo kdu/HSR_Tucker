@@ -15,6 +15,7 @@ function [SRI_hat,cost, err] = run_hosvd_blind1(SRI,MSI,HSI,R,P1,P2,Pm, Nblocks)
 %     err: cell array of metrics
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ Nblocks 
 step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ Nblocks 

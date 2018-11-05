@@ -10,8 +10,9 @@ function Pm = spectral_deg(DATA,sensor)
 %     Pm: spectral degradation matrix of size KmxKh
 % 
 % SEE ALSO: SPATIAL_DEG
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 if sensor==1

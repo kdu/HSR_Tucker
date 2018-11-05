@@ -12,8 +12,9 @@ function C = solveC_normal(A_tilde, B_tilde, C_tilde, Pm, HSI)
 %     C: factor matrix of size KhxF
 % 
 % SEE ALSO: SOLVEC_QR
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 X = (B_tilde'*B_tilde).*(A_tilde'*A_tilde);

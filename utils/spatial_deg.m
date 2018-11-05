@@ -13,8 +13,9 @@ function [P1,P2] = spatial_deg(DATA, q, d1, d2)
 %     P2: degradation along mode 2 of size JhxJm
 % 
 % SEE ALSO: SPECTRAL_DEG
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 Im = size(DATA,1); Jm = size(DATA,2);

@@ -10,8 +10,9 @@ function sam = sam(DATA,est)
 %     sam: SAM between DATA and est
 % 
 % SEE ALSO: NMSE, ERGAS, R_SNR
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 DATA_3 = tens2mat(DATA,[],3);

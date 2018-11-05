@@ -10,8 +10,9 @@ function nmse = nmse(DATA, est)
 %     nmse: NMSE between DATA and est
 % 
 % SEE ALSO: SAM, ERGAS, R_SNR
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 

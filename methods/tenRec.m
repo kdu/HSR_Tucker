@@ -17,8 +17,9 @@ function [A, B, A_tilde, B_tilde, C] = tenRec(DATA, HSI, F, P1,P2,Pm)
 %     C: matrix of size KhxF
 % such that HSI = [A_tilde, B_tilde, C] and MSI = [A,B,Pm*C]
 % 
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 options.MaxIter = 25; %options.Display = true;

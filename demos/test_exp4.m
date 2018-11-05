@@ -1,6 +1,7 @@
 % EXPERIMENT 4 : TEST PERFORMANCE OF HOSVD W. PANCHROMATIC IMAGE %
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption (Indian pines)

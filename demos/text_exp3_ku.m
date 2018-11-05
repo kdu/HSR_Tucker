@@ -1,6 +1,7 @@
 % EXPERIMENT 3: COMPARISON OF METRICS WITH STEREO %
-% Copyright (c) 2018 ClÃ©mence PrÃ©vost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 addpath ../utils
 addpath ../metrics

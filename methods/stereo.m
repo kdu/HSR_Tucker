@@ -17,8 +17,9 @@ function [A,B,C, SRI_hat, err, cost] = stereo(lambda, F, A0,B0,C0,SRI, HSI, MSI,
 %     err: structure containing NMSE, SAM, ERGAS, R-SNR, CC, CPU TIME
 % 
 % SEE ALSO: TENREC
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 
 A = A0; B = B0; C = C0; opts.POSDEF = true; opts.SYM = true;

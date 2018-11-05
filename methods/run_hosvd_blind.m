@@ -13,8 +13,9 @@ function [SRI_hat,cost, err] = run_hosvd_blind(SRI,MSI,HSI,R,P1,P2,Pm, alpha)
 %     SRI_hat: estimated SRI
 %     cost: value of the cost function
 %     err: cell array of metrics
-% Copyright (c) 2018 Clémence Prévost, Konstantin Usevich, Pierre Comon, David Brie
+% Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
+% Contact: clemence.prevost@univ-lorraine.fr
 
 tic,
 [fact,S] = mlsvd(MSI, R); % hosvd
