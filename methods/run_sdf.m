@@ -1,4 +1,4 @@
-function [SRI_hat,cost, err] = run_sdf(MSI, HSI, SRI, ranks, options, P1,P2,Pm)
+function [SRI_hat,info] = run_sdf(HSI, MSI, P1, P2, Pm, ranks, opts)
 
 % RUN_SDF runs the HOSVD algorithm for specified rank R followed by 
 % TensorLab optimization
@@ -18,23 +18,22 @@ function [SRI_hat,cost, err] = run_sdf(MSI, HSI, SRI, ranks, options, P1,P2,Pm)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
+if nargin==6
+    lambda = 1; Display = 'false'; alpha = 0; opti_Niter = 30;
+elseif nargin==7
+    lambda = opts.lambda; Display = opts.Display; alpha = opts.alpha;
+    opti_Niter = opts.opti_Niter;
+end
 
-R = ranks;
+[U, ~, ~] = svds(tens2mat(MSI,1,[]),ranks(1));
+[V, ~, ~] = svds(tens2mat(MSI,2,[]),ranks(2));
+[W, ~, ~] = svds(tens2mat(HSI,3,[]), ranks(3));
 
-[U, ~, ~] = svds(tens2mat(MSI,1,[]),R(1));
-[V, ~, ~] = svds(tens2mat(MSI,2,[]),R(2));
-[W, ~, ~] = svds(tens2mat(HSI,3,[]), R(3));
-
-lam = 1;
 A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
-B = lam* W'*(Pm'*Pm)*W;
-b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lam * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
-C = reshape(b_old, R(1)*R(2), R(3));
-S = reshape(sylvester(A,B,C),R);
-A = kron(eye(R(3)),kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U)) + lam * kron(W'*(Pm'*Pm)*W, eye(R(1)*R(2)));
-b = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lam * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
-S = reshape(A\ b(:),R);
-
+B = lambda* W'*(Pm'*Pm)*W;
+b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+C = reshape(b_old, ranks(1)*ranks(2), ranks(3));
+S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),B,C),ranks);
 
 model = struct;
 model.variables = {U,V,W,S};
@@ -45,16 +44,17 @@ model.factors.F = {3, @(W,task) struct_matvec(W, task, Pm, eye(ranks(3)))};
 model.factorizations{1}.data = HSI;
 model.factorizations{1}.weight = 2;
 model.factorizations{1}.lmlra  = {'D', 'E', 'C','S'};
-%model.factorizations{1}.myreg.regL2    = 'S';
-%model.factorizations{1}.myreg.weight   = 0.1;
 model.factorizations{2}.data = MSI;
 model.factorizations{2}.weight = 2;
 model.factorizations{2}.lmlra  = {'A', 'B', 'F', 'S'};
-sol = sdf_nls(model, 'MaxIter', 30);
+[sol, output] = sdf_nls(model, 'MaxIter', opti_Niter);
 
 U = sol.variables{1}; V = sol.variables{2}; W = sol.variables{3}; S = sol.variables{4};
-SRI_hat = lmlragen({U,V,W},S); cost = frob(HSI - lmlragen({P1*U,P2*V,W}, S),'squared') + frob(MSI - lmlragen({U,V,Pm*W},S),'squared');
-err = {cost nmse(SRI,SRI_hat), cc(SRI,SRI_hat), SAM(SRI,SRI_hat), ergas(SRI,SRI_hat,1/4), r_snr(SRI,SRI_hat)};
-%snr = r_snr(SRI,SRI_hat);
+SRI_hat = lmlragen({U,V,W},S); 
+info.factors = {'U','V','W'};
+info.core = {'S'};
+info.rank = {'ranks'};
+info.opti = {'output'};
+
 end
 
