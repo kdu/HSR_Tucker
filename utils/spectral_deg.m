@@ -15,12 +15,12 @@ function Pm = spectral_deg(DATA,sensor)
 % Contact: clemence.prevost@univ-lorraine.fr
 
 
-if sensor==1
+if sensor=="LANDSAT"
     Km = 6;
     spectral_distrib = linspace(400,2500,size(DATA,3)); %Hyp: uniform distribution
 
     bands = [450 520; 520 600; 630 690; 760 900; 1550 1770; 2080 2350];
-elseif sensor==2
+elseif sensor=="Quickbird"
     Km = 4;
     spectral_distrib = linspace(430,860,size(DATA,3)); %Hyp: uniform distribution
     bands = [430 545; 466 620; 590 710; 715 918];
