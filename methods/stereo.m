@@ -20,7 +20,7 @@ function [SRI_hat, info] = stereo(HSI, MSI, P1, P2, Pm, ranks, opts)
 
 if nargin==6
     lambda = 1; Niter = 10; opts.CPD_Niter = 25; Display = 'false';
-    [A, B, ~,~, C] = tenRec(MSI, HSI, P1, P2, Pm, ranks, opts);
+    [A, B, ~,~, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks, opts);
 elseif nargin==7
     lambda = opts.lambda; Niter = opts.Niter; Display = opts.Display;
     A = opts.factors{1}; B = opts.factors{2}; C = opts.factors{3};
