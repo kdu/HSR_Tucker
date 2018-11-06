@@ -20,16 +20,14 @@ MSI = tmprod(SRI,Pm,3); %Make panchromatic image
 %% 
 % R1 = 1:36; R3 = 1:25; 
 R1 = 37:50; R3 = 1:6; 
-alpha = 0; %No regularization
-%options.MaxIter = 30;
 for i=1:length(R1)
     for j=1:length(R3)
         R = [R1(i), R1(i), R3(j)];
         filename = sprintf('HSPan_exp4_%d_%d_%d_IP',R1(i),R1(i),R3(j));
-        %[SRI_hat,cost, snr] = run_sdf(MSI, HSI, SRI ,R,options,P1,P2,Pm);
-        [SRI_hat,cost, err] = run_hosvd(SRI,MSI,HSI,R,P1,P2,Pm, alpha);
-        snr = err{6};
-        %save(filename,'SRI_hat','cost','snr');
+        %[SRI_hat,info] = scott_opti(HSI, MSI, P1, P2, Pm, R);
+        [SRI_hat,info] = scott(HSI, MSI, P1, P2, Pm, R);
+        err = compute_metrics(SRI,SRI_hat,d1); snr = err{1};
+        save(filename,'SRI_hat','cost','snr');
     end
 end
 
