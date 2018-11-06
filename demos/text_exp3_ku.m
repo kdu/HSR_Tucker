@@ -12,7 +12,7 @@ SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption (Indian pines)
 SRI(1,:,:) = []; SRI(:,1,:) = [];
 % 
-Pm = spectral_deg(SRI,1);
+Pm = spectral_deg(SRI,"LANDSAT");
 MSI = tmprod(SRI,Pm,3);
  
 d1 = 4; d2 = 4; q = 9;
@@ -20,9 +20,9 @@ d1 = 4; d2 = 4; q = 9;
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
 
-[S7,~, err7] = run_hosvd_blind(SRI,MSI,HSI,[40,40,6],P1,P2,Pm);
-[S8,~, err8] = run_hosvd_blind(SRI,MSI,HSI,[60,60,6],P1,P2,Pm);
-[S9,~, err9] = run_hosvd_blind(SRI,MSI,HSI,[100,100,6],P1,P2,Pm);
+[S7,~] = bscott(MSI,HSI,[40,40,6],Pm);
+[S8,~] = bscott(MSI,HSI,[60,60,6],Pm);
+[S9,~] = bscott(MSI,HSI,[100,100,6],Pm);
 
 %% MAKE TABLE FROM RESULTS
 
