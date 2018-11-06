@@ -1,4 +1,4 @@
-function [SRI_hat,info] = bscott(HSI, MSI, ranks, Pm, opts)
+function [SRI_hat,info] = bscott(MSI,HSI,R,Pm,opts)
 
 % RUN_HOSVD runs the HOSVD algorithm for specified rank R
 % [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 
@@ -17,22 +17,34 @@ function [SRI_hat,info] = bscott(HSI, MSI, ranks, Pm, opts)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-if nargin==6
-    Display = 'false';
-elseif nargin==7
-    Display = opts.Display;
+if nargin==4
+    Nblocks = [1,1]; 
+elseif nargin==5
+    Nblocks = opts.Nblocks; 
 end
 
-[fact,S] = mlsvd(MSI, ranks); % hosvd
-U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
-[W_H, ~, ~] = svds(tens2mat(HSI,3,[]), ranks(3));
-T = (Pm * W_H) \ W_tilde;
+step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ Nblocks; 
+step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ Nblocks ;
+SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
-W = W_H * T;
-SRI_hat = lmlragen({U,V,W},S); 
+for i1=1:Nblocks(1)
+  for i2=1:Nblocks(2) 
+    [fact,S] = mlsvd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
+                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), R); % hosvd
+    U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
+    [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
+                                (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R(3));
+    T = (Pm * W_H) \ W_tilde;
+
+    W = W_H * T;
+    SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
+            (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = lmlragen({U,V,W},S); 
+  end
+end 
+
 info.factors = {'U','V','W'};
 info.core = {'S'};
-info.rank = {'ranks'};
+info.rank = {'R'};
 
 end
 
