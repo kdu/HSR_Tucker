@@ -5,7 +5,7 @@ function Pm = spectral_deg(DATA,sensor)
 % 
 % INPUT ARGUMENTS:
 %     DATA: SRI of size ImxJmxKh
-%     sensor: 1 for LANDSAT, 2 for QuickBird
+%     sensor: LANDSAT or Quickbird
 % OUTPUT ARGUMENTS:
 %     Pm: spectral degradation matrix of size KmxKh
 % 

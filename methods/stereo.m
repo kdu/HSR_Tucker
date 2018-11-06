@@ -5,15 +5,14 @@ function [SRI_hat, info] = stereo(HSI, MSI, P1, P2, Pm, ranks, opts)
 % SRI_hat = [A,B,C] from HSI and MSI
 % 
 % INPUT ARGUMENTS:
-%     F: tensor rank of estimation
+%     ranks: tensor rank of estimation
 %     HSI, MSI: lower-resolution images
 %     P1,P2,Pm: degradation matrices
-%     opts: structure containing parameters
+%     opts: options structure
 % OUTPUT ARGUMENTS:
 %     SRI_hat: estimation of SRI such that SRI_hat = [A,B,C]
 %     info: informative structure about the method
 % 
-% SEE ALSO: TENREC
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
@@ -54,9 +53,9 @@ for n = 1:Niter
 end
 
 SRI_hat = cpdgen({A,B,C});
-info.factors = {'A','B','C'};
-info.rank = {'ranks'};
-info.Niter = {'Niter'};
+info.factors = {A,B,C};
+info.rank = {ranks};
+info.Niter = {Niter};
 
 end
 

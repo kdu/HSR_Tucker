@@ -1,14 +1,16 @@
 function [A, B, A_tilde, B_tilde, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks, opts)
 
-% TENREC initialization of STEREO
-% [A_tilde, B_tilde, C] = TENREC(DATA, F, P1,P2,Pm) performs CPD of DATA 
+% STEREO_INIT initialization of STEREO
+% [A, B, A_tilde, B_tilde, C] = STEREO_INIT((MSI, HSI, P1, P2, Pm, ranks, opts)
+% performs CPD of DATA 
 % in the case where spatial degradation factors are known
 % 
 % INPUT ARGUMENTS:
-%     DATA: dataset on which CPD is performed
+%     MSI: multispectral image
 %     HSI: hyperspectral image
-%     F: Tensor rank of MSI rank decomposition
+%     ranks: Tensor rank of MSI rank decomposition
 %     P1,P2,Pm: spectral and spatial degradation matrices 
+%     opts: options structure
 % OUTPUT ARGUMENTS:
 %     A: matrix of size ImxF
 %     B: matrix of size JmxF

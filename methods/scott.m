@@ -1,18 +1,18 @@
-function [SRI_hat, info] = scott(HSI, MSI, P1, P2, Pm, ranks, opts)
+function [SRI_hat, info] = scott(HSI, MSI, P1, P2, Pm, R, opts)
 
-% RUN_HOSVD runs the HOSVD algorithm for specified rank R
-% [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 
-% estimation of SRI, value of cost function and metrics in the cell array err
+% SCOTT runs the SCOTT algorithm for specified rank R
+% [SRI_hat,info] = SCOTT(HSI, MSI, P1, P2, Pm, ranks, opts) returns 
+% estimation of SRI and informative structure
 % 
 % INPUT ARGUMENTS:
-%     SRI, MSI, HSI: input datasets (resp. groundtruth SRI, MSI and HSI
-%     R: specified multilinear rank
+%     MSI, HSI: input datasets (resp. MSI and HSI)
 %     P1,P2,Pm: spatial and spectral degratation matrices
-%     alpha: possible regularization (usually set to zero when fct is employed
+%     ranks: specified multilinear rank
+%     opts: options structure 
 % OUTPUT ARGUMENTS:
 %     SRI_hat: estimated SRI
-%     cost: value of the cost function
-%     err: cell array of metrics
+%     info: informative structure
+%
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
@@ -23,9 +23,9 @@ elseif nargin==7
     lambda = opts.lambda; Display = opts.Display; alpha = opts.alpha;
 end
 
-[U, ~, ~] = svds(tens2mat(MSI,1,[]),ranks(1));
-[V, ~, ~] = svds(tens2mat(MSI,2,[]),ranks(2));
-[W, ~, ~] = svds(tens2mat(HSI,3,[]), ranks(3));
+[U, ~, ~] = svds(tens2mat(MSI,1,[]),R(1));
+[V, ~, ~] = svds(tens2mat(MSI,2,[]),R(2));
+[W, ~, ~] = svds(tens2mat(HSI,3,[]), R(3));
 
 %%%%%%%%%%%%%%%%%%%
 % ALWAYS WORKS BUT SLOWER  %
@@ -41,13 +41,13 @@ end
 A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
 B = lambda* W'*(Pm'*Pm)*W;
 b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
-C = reshape(b_old, ranks(1)*ranks(2), ranks(3));
-S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),B,C),ranks);
+C = reshape(b_old, R(1)*R(2), R(3));
+S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),B,C),R);
 
 SRI_hat = lmlragen({U,V,W},S);
-info.factors = {'U','V','W'};
-info.core = {'S'};
-info.rank = {'ranks'};
+info.factors = {U,V,W};
+info.core = {S};
+info.rank = {ranks};
 
 end
 

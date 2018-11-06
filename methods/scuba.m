@@ -1,21 +1,23 @@
-function [SRI_hat,info] = scuba(MSI,HSI,F,R,Pm, opts)
+function [SRI_hat,info] = scuba(MSI,HSI,ranks,Pm, opts)
 
-% RUN_HOSVD runs the HOSVD algorithm for specified rank R
-% [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 
-% estimation of SRI, value of cost function and metrics in the cell array err
+% SCUBA runs the SCUBA algorithm for specified rank R
+% [SRI_hat,info] = SCUBA(MSI,HSI,ranks,Pm, opts) returns 
+% estimation of SRI and informative structure
 % 
 % INPUT ARGUMENTS:
-%     SRI, MSI, HSI: input datasets (resp. groundtruth SRI, MSI and HSI
-%     R: specified multilinear rank
-%     P1,P2,Pm: spatial and spectral degratation matrices
-%     alpha: possible regularization (usually set to zero when fct is employed
+%     MSI, HSI: input datasets (resp. MSI and HSI)
+%     ranks: field of CP rank + spectral rank
+%     Pm: spectral degratation matrix
+%     opts: options structure
 % OUTPUT ARGUMENTS:
 %     SRI_hat: estimated SRI
-%     cost: value of the cost function
-%     err: cell array of metrics
+%     info: informative structure
+%     
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
+
+F = ranks(1); R = ranks(2);
 
 if nargin==5
     Nblocks = [1,1]; 
@@ -47,9 +49,9 @@ for i1=1:Nblocks(1)
   end
 end 
 
-info.steps = {'step_MSI','step_HSI'};
-info.factors = {'A','B','C'};
-info.rank = {'R', 'F'};
+info.steps = {step_MSI,step_HSI};
+info.factors = {A,B,C};
+info.rank = {R, F};
 
 
 end
