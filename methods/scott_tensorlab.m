@@ -33,7 +33,7 @@ A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
 B = lambda* W'*(Pm'*Pm)*W;
 b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
 C = reshape(b_old, R(1)*R(2), R(3));
-S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),B,C),R);
+S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),(B+alpha*norm(A,2)^2*ones(size(B,2))),C),R);
 
 model = struct;
 model.variables = {U,V,W,S};

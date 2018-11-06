@@ -1,4 +1,4 @@
-function ergas = ergas(DATA,est,d)
+function ergas = ergas(DATA,est,d1,d2)
 
 % ERGAS computes ERGAS between original dataset and its estimate
 % ergas = ERGAS(DATA, est,d) returns real number
@@ -21,7 +21,7 @@ for k=1:size(DATA,3)
     mu = mean(mean(DATA(:,:,k)));
     ergas = ergas + norm(reshape(est(:,:,k)-DATA(:,:,k),[],1),'fro')^2/mu^2;
 end
-ergas = 100*d*sqrt(ergas/numel(DATA)); 
+ergas = 100*(1/sqrt(d1*d2))*sqrt(ergas/numel(DATA)); 
 
 end
 
