@@ -1,4 +1,4 @@
-function [SRI_hat,cost, err] = run_scuba(SRI,MSI,HSI,F,R,P1,P2,Pm, Nblocks)
+function [SRI_hat,info] = scuba(MSI,HSI,F,R,Pm, opts)
 
 % RUN_HOSVD runs the HOSVD algorithm for specified rank R
 % [SRI_hat,cost, err] = RUN_HOSVD(SRI,MSI,HSI,R,P1,P2,Pm, alpha) returns 
@@ -17,11 +17,17 @@ function [SRI_hat,cost, err] = run_scuba(SRI,MSI,HSI,F,R,P1,P2,Pm, Nblocks)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ Nblocks 
-step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ Nblocks 
+if nargin==5
+    Nblocks = [1,1]; 
+elseif nargin==6
+    Nblocks = opts.Nblocks; 
+end
+
+step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ Nblocks ;
+step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ Nblocks ;
 SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
-tic,
+
 for i1=1:Nblocks(1)
   for i2=1:Nblocks(2) 
     options.Display = true;  
@@ -40,11 +46,11 @@ for i1=1:Nblocks(1)
             (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = cpdgen({A,B,C}); 
   end
 end 
-time = toc
-    
-    
-cost = 0;
-err = {cost nmse(SRI,SRI_hat), cc(SRI,SRI_hat), sam(SRI,SRI_hat), ergas(SRI,SRI_hat,1/4), r_snr(SRI,SRI_hat),time};
+
+info.steps = {'step_MSI','step_HSI'};
+info.factors = {'A','B','C'};
+info.rank = {'R', 'F'};
+
 
 end
 
