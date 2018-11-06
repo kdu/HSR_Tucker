@@ -23,7 +23,7 @@
 SRI = cell2mat(struct2cell(load('Salinas.mat')));
 SRI = crop(SRI,[80,84,size(SRI,3)]);
 SRI(:,:,[108:112 154:167 224]) = []; %Regions of water absorption (Salinas)
-Pm = spectral_deg(SRI,1);
+Pm = spectral_deg(SRI,"LANDSAT");
 MSI = tmprod(SRI,Pm,3);
 d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);
@@ -41,9 +41,9 @@ for i=1:length(R1)
     for j=1:length(R3)
         R = [R1(i), R1(i), R3(j)];
         filename = sprintf('data_exp1_%d_%d_%d_Sal',R1(i),R1(i),R3(j));
-        %[SRI_hat,cost, snr] = run_sdf(MSI, HSI, SRI ,R,options,P1,P2,Pm);
-        [SRI_hat,cost, err] = run_hosvd(SRI,MSI,HSI,R,P1,P2,Pm, alpha);
-        snr = err{6};
+        %[SRI_hat,info] = scott_opti(HSI, MSI, P1, P2, Pm, R);
+        [SRI_hat,info] = scott(HSI, MSI, P1, P2, Pm, R);
+        err = compute_metrics(SRI,SRI_hat,d1); snr = err{1};
         save(filename,'SRI_hat','cost','snr');
     end
 end
