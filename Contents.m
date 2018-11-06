@@ -12,13 +12,16 @@
 % scott_opti              - runs SCOTT algorithm with TensorLab optimization
 % scuba                   - runs SCUBA algorithm
 % stereo                  - runs STEREO algorithm
+% stereo_blind            - runs blind STEREO algorithm
 % stereo_init             - initializes the factor matrices for STEREO
+% stereo_init_blind       - initializes factor matrices for STEREO_BLIND
 % cc                      - computes Pearson cross-correlation btw two tensors
 % compute_metrics         - returns array of metrics
 % ergas                   - computes relative global error btw two tensors
 % nmse                    - computes NMSE btw two tensors
 % r_snr                   - computes R-SnR btw two tensors
 % sam                     - computes spectral angle mapper btw two tensors
+% bartelsStewart          - solves generalized Sylvester equation via BS
 % crop                    - crops array to the specified dimensions
 % gauss_kernel            - computes Gaussian blurring kernel
 % solveC_normal           - solves C in stereo_init with normal equations
