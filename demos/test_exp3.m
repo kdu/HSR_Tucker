@@ -35,19 +35,17 @@ R1 = [40,40,6]; R2 = [30,30,16]; R3 = [24,24,25];
 % [~,~,~,Sb] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
 % errb = {nmse(SRI,Sb), SAM(SRI,Sb), ergas(SRI,Sb), r_snr(SRI,Sb), cc(SRI,Sb)};
 F = 50;
-[A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-[~,~,~,S0] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
-err0 = {nmse(SRI,S0), SAM(SRI,S0), ergas(SRI,S0), r_snr(SRI,S0), cc(SRI,S0)};
+[S0,~] = stereo(HSI, MSI, P1, P2, Pm, F);
+err0 = compute_metrics(SRI,S0);
 F = 100;
-[A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-[~,~,~,S1] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
-err1 = {nmse(SRI,S1), SAM(SRI,S1), ergas(SRI,S1), r_snr(SRI,S1), cc(SRI,S1)};
+[~,~,~,S1] = stereo(HSI, MSI, P1, P2, Pm, F);
+err1 = compute_metrics(SRI,S1);
 
-[S2,~, err2] = run_hosvd(SRI,MSI,HSI,R1,P1,P2,Pm);
-[S3,~, err3] = run_hosvd(SRI,MSI,HSI,R2,P1,P2,Pm);
-[S4,~, err4] = run_hosvd(SRI,MSI,HSI,R3,P1,P2,Pm);
-% [S5,~, err5] = run_hosvd(SRI,MSI,HSI,R4,P1,P2,Pm);
-% [S6,~, err6] = run_hosvd(SRI,MSI,HSI,R5,P1,P2,Pm);
+[S2,~] = scott(HSI, MSI, P1, P2, Pm, R1);
+[S3,~] = scott(HSI, MSI, P1, P2, Pm, R2);
+[S4,~] = scott(HSI, MSI, P1, P2, Pm, R3);
+% [S5,~] = scott(HSI, MSI, P1, P2, Pm, R4);
+% [S6,~] = scott(HSI, MSI, P1, P2, Pm, R5);
 
 
 %% MAKE TABLE FROM RESULTS
