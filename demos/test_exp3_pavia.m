@@ -18,7 +18,7 @@ SRI(1:2,:,:) = []; SRI(:,1:4,:) = [];
 %SRI = SRI(:,1:320,:);
 %SRI(1,:,:) = []; SRI(:,1,:) = [];
 % 
-Pm = spectral_deg(SRI,2);
+Pm = spectral_deg(SRI,"Quickbird");
 MSI = tmprod(SRI,Pm,3);
  
 d1 = 4; d2 = 4; q = 9;
@@ -45,16 +45,16 @@ HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 % [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
 % [~,~,~,S1] = stereo(1, F, A0,B0,C0, SRI, HSI, MSI, P1,P2,Pm, 10);
 % err1 = {nmse(SRI,S1), sam(SRI,S1), ergas(SRI,S1,1/d1), r_snr(SRI,S1), cc(SRI,S1)};
-[S1,~, err1] = run_scuba(SRI,MSI,HSI,120,3,P1,P2,Pm,[4 4]);
+opts.Nblocks = [4,4];
+[S1,~] = scuba(MSI,HSI,120,3,Pm,opts);
 
+[S2,~] = scott(HSI, MSI, P1, P2, Pm,[60,60,4]);
 
-[S2,~, err2] = run_hosvd(SRI,MSI,HSI,[60,60,4],P1,P2,Pm);
+[S3,~] = bscott(MSI,HSI,[100,100,4],Pm);
 
-[S3,~, err3] = run_hosvd_blind(SRI,MSI,HSI,[100,100,4],P1,P2,Pm);
+[S4,~] = bscott(MSI,HSI,[60,60,3],Pm,opts);
 
-[S4,~, err4] = run_hosvd_blind_scuba(SRI,MSI,HSI,[60,60,3],P1,P2,Pm,[4 4]);
-
-[S5,~, err5] = run_hosvd_blind_scuba(SRI,MSI,HSI,[120,60,4],P1,P2,Pm,[4 4]);
+[S5,~] = bscott(MSI,HSI,[120,60,4],Pm,opts);
 
 figure(1)
 subplot(2,2,1)
