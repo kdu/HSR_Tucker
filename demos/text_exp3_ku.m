@@ -19,7 +19,6 @@ d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
-
 [S7,~] = bscott(MSI,HSI,[40,40,6],Pm);
 [S8,~] = bscott(MSI,HSI,[60,60,6],Pm);
 [S9,~] = bscott(MSI,HSI,[100,100,6],Pm);
