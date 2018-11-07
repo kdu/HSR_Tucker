@@ -29,9 +29,9 @@ R3 = [24,24,25];
 %%%%%%%%
 % RANKS FOR SALINAS %
 %%%%%%%%%%%%%%%%%%%%%
-% R1 = [40,40,6]; 
-% R2 = [30,30,6]; 
-% R3 = [14,14,15];
+R1 = [40,40,6]; 
+R2 = [30,30,6]; 
+R3 = [14,14,15];
 
 nb_materials = max(max(indian_pines_gt)); mat = tens2mat(SRI,3,[]);
 %nb_materials = max(max(salinas_gt)); mat = tens2mat(SRI,3,[]);
@@ -46,10 +46,8 @@ S1 = cell2mat(struct2cell(load(filename1,'SRI_hat')));
 S2 = cell2mat(struct2cell(load(filename2,'SRI_hat'))); 
 S3 = cell2mat(struct2cell(load(filename3,'SRI_hat')));
 
-mat1 = tens2mat(S1,3,[]);
-mat2 = tens2mat(S2,3,[]);
-mat3 = tens2mat(S3,3,[]);
-matS = tens2mat(SRIh_S,3,[]);
+mat1 = tens2mat(S1,3,[]); mat2 = tens2mat(S2,3,[]);
+mat3 = tens2mat(S3,3,[]); matS = tens2mat(SRIh_S,3,[]);
 
 eb = [4 7 9 14]; %number of materials you want (you can change)
 for n=1:4

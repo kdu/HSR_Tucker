@@ -9,17 +9,17 @@
 % SRI = crop(SRI,[80,84,size(SRI,3)]);
 % SRI(:,:,[108:112 154:167 224]) = []; %Regions of water absorption (Salinas)
 
-% %Indian Pines
-% SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
-% SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption (Indian pines)
-% SRI(1,:,:) = []; SRI(:,1,:) = [];
-% 
-% Pm = spectral_deg(SRI);
-% MSI = tmprod(SRI,Pm,3);
-% 
-% d1 = 4; d2 = 4; q = 9;
-% [P1,P2] = spatial_deg(SRI, q, d1, d2);
-% HSI = tmprod(tmprod(SRI,P1,1),P2,2);
+%Indian Pines
+SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
+SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption (Indian pines)
+SRI(1,:,:) = []; SRI(:,1,:) = [];
+
+Pm = spectral_deg(SRI);
+MSI = tmprod(SRI,Pm,3);
+
+d1 = 4; d2 = 4; q = 9;
+[P1,P2] = spatial_deg(SRI, q, d1, d2);
+HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
 
 % R1 = [40,40,6]; R2 = [14,14,15]; R3 = [10,15,25];

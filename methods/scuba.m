@@ -20,7 +20,7 @@ function [SRI_hat,info] = scuba(MSI,HSI,ranks,Pm, opts)
 F = ranks(1); R = ranks(2);
 
 if nargin==5
-    Nblocks = [1,1]; 
+    Nblocks = [1,1];
 elseif nargin==6
     Nblocks = opts.Nblocks; 
 end
@@ -42,7 +42,6 @@ for i1=1:Nblocks(1)
                                 (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R);
     T = (Pm * W_H) \ C_tilde;
 
-    lam = 1;
     C = W_H * T;
     SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
             (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = cpdgen({A,B,C}); 

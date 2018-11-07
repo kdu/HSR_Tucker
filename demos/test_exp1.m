@@ -11,7 +11,7 @@
 % SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 % SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
 % SRI(1,:,:) = []; SRI(:,1,:) = [];
-% Pm = spectral_deg(SRI);
+% Pm = spectral_deg(SRI,"LANDSAT");
 % MSI = tmprod(SRI,Pm,3);
 % d1 = 4; d2 = 4; q = 9;
 % [P1,P2] = spatial_deg(SRI, q, d1, d2);
@@ -34,7 +34,7 @@ HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 %%%%%
 % FIX R1 = R2 %
 %%%%%%%%%%%%%%%
-R1 = 21:40; R3 = 2:6; 
+R1 = 21:40; R3 = 2:6; %Pick the range for ranks IN RECOVERABILITY ZONE
 alpha = 0; %No regularization
 options.MaxIter = 30;
 for i=1:length(R1)
