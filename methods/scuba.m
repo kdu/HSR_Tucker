@@ -19,19 +19,20 @@ function [SRI_hat,info] = scuba(MSI,HSI,ranks,Pm, opts)
 
 F = ranks(1); R = ranks(2);
 
-if nargin==5
-    Nblocks = [1,1];
-elseif nargin==6
-    Nblocks = opts.Nblocks; 
+if ~exist('opts','var')
+    opts = struct();
+end
+if ~isfield(opts,'Nblocks') || isempty(opts.Nblocks)
+    opts.Nblocks = [1,1];
 end
 
-step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ Nblocks ;
-step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ Nblocks ;
+step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ opts.Nblocks ;
+step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ opts.Nblocks ;
 SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
 
-for i1=1:Nblocks(1)
-  for i2=1:Nblocks(2) 
+for i1=1:opts.Nblocks(1)
+  for i2=1:opts.Nblocks(2) 
     options.Display = true;  
     options.MaxIter = 25; %options.Display = true;
     U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...

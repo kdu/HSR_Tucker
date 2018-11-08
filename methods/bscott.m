@@ -17,18 +17,19 @@ function [SRI_hat,info] = bscott(MSI,HSI,R,Pm,opts)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-if nargin==4
-    Nblocks = [1,1]; 
-elseif nargin==5
-    Nblocks = opts.Nblocks; 
+if ~exist('opts','var')
+    opts = struct();
+end
+if ~isfield(opts,'Nblocks') || isempty(opts.Nblocks)
+    opts.Nblocks = [1,1];
 end
 
-step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ Nblocks; 
-step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ Nblocks ;
+step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ opts.Nblocks; 
+step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ opts.Nblocks ;
 SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
-for i1=1:Nblocks(1)
-  for i2=1:Nblocks(2) 
+for i1=1:opts.Nblocks(1)
+  for i2=1:opts.Nblocks(2) 
     [fact,S] = mlsvd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
                          (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), R); % hosvd
     U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    

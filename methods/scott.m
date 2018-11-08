@@ -17,10 +17,14 @@ function [SRI_hat, info] = scott(HSI, MSI, P1, P2, Pm, R, opts)
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-if nargin==6
-    lambda = 1; Display = 'false'; alpha = 0;
-elseif nargin==7
-    lambda = opts.lambda; Display = opts.Display; alpha = opts.alpha;
+if ~exist('opts','var')
+    opts = struct();
+end
+if ~isfield(opts,'lambda') || isempty(opts.lambda)
+    opts.lambda = 1;
+end
+if ~isfield(opts,'alpha') || isempty(opts.alpha)
+    opts.alpha = 0;
 end
 
 [U, ~, ~] = svds(tens2mat(MSI,1,[]),R(1));
@@ -39,15 +43,15 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
-B = lambda* W'*(Pm'*Pm)*W;
-b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+B = opts.lambda* W'*(Pm'*Pm)*W;
+b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
 C = reshape(b_old, R(1)*R(2), R(3));
-S = reshape(sylvester((A+alpha*norm(A,2)^2*ones(size(A,2))),(B+alpha*norm(A,2)^2*ones(size(B,2))),C),R);
+S = reshape(sylvester((A+opts.alpha*norm(A,2)^2*ones(size(A,2))),(B+opts.alpha*norm(A,2)^2*ones(size(B,2))),C),R);
 
 SRI_hat = lmlragen({U,V,W},S);
 info.factors = {U,V,W};
 info.core = {S};
-info.rank = {ranks};
+info.rank = {R};
 
 end
 

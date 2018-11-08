@@ -21,26 +21,34 @@ function [SRI_hat, info] = stereo_blind(HSI, MSI, Pm, ranks, opts)
 
 F = ranks;
 
-if nargin==4
-    lambda = 1; Niter = 10; opts.CPD_Niter = 25; Display = 'false';
-    [A, B, A_tilde, B_tilde, C] = stereo_init_blind(MSI,HSI, ranks, Pm);
-elseif nargin==5
-    lambda = opts.lambda; Niter = opts.Niter; Display = opts.Display;
-    A = opts.factors{1}; B = opts.factors{2}; C = opts.factors{3}; 
-    A_tilde = opts.factors{4}; B_tilde = opts.factors{5};
+if ~exist('opts','var')
+    opts = struct();
 end
+if ~isfield(opts,'lambda') || isempty(opts.lambda)
+    opts.lambda = 1;
+end
+if ~isfield(opts,'Niter') || isempty(opts.Niter)
+    opts.Niter = 10;
+end
+if ~isfield(opts,'CPD_Niter') || isempty(opts.CPD_Niter)
+    opts.CPD_Niter = 25;
+end
+if ~isfield(opts,'factors') || isempty(opts.factors)
+    [A, B, A_tilde, B_tilde, C] = stereo_init_blind(MSI,HSI, ranks, Pm);
+end
+
 
 options.POSDEF = true; options.SYM = true;
 
 Yh1 = tens2mat(HSI,[],1); Yh2 = tens2mat(HSI,[],2); Yh3 = tens2mat(HSI,[],3);
 Ym1 = tens2mat(MSI,[],1); Ym2 = tens2mat(MSI,[],2); Ym3 = tens2mat(MSI,[],3);
 
-for n = 1:Niter
+for n = 1:opts.Niter
 
     disp('C...')
     mat1 = kr(B,A); mat2 = kr(B_tilde,A_tilde);
-    R = lambda*Pm'*Ym3'*mat1 + Yh3'*mat2;
-    Q = lambda*kron((B'*B).*(A'*A), Pm'*Pm) + kron((B_tilde'*B_tilde).*(A_tilde'*A_tilde), eye(size(Pm,2)));
+    R = opts.lambda*Pm'*Ym3'*mat1 + Yh3'*mat2;
+    Q = opts.lambda*kron((B'*B).*(A'*A), Pm'*Pm) + kron((B_tilde'*B_tilde).*(A_tilde'*A_tilde), eye(size(Pm,2)));
     C = reshape(linsolve(Q, R(:), options),[size(Pm,2) F]);
     
     disp('A tilde...')
@@ -71,7 +79,7 @@ end
 SRI_hat = cpdgen({A,B,C});
 info.factors = {A,B,C,A_tilde, B_tilde};
 info.rank = {ranks};
-info.Niter = {Niter};
+info.Niter = {opts.Niter};
 
 
 
