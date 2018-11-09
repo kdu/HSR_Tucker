@@ -1,4 +1,4 @@
-function [SRI_hat,info] = scuba(MSI,HSI,ranks,Pm, opts)
+function [SRI_hat,info] = scuba(MSI,HSI,Pm, ranks, opts)
 
 % SCUBA runs the SCUBA algorithm for specified rank R
 % [SRI_hat,info] = SCUBA(MSI,HSI,ranks,Pm, opts) returns 
@@ -33,7 +33,7 @@ SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
 for i1=1:opts.Nblocks(1)
   for i2=1:opts.Nblocks(2) 
-    options.Display = true;  
+    %options.Display = true;  
     options.MaxIter = 25; %options.Display = true;
     U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
                          (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), F,options);

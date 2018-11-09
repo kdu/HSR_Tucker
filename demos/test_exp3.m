@@ -14,57 +14,40 @@ SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption (Indian pines)
 SRI(1,:,:) = []; SRI(:,1,:) = [];
 
-Pm = spectral_deg(SRI);
+Pm = spectral_deg(SRI,"LANDSAT");
 MSI = tmprod(SRI,Pm,3);
 
 d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
+methods_nb = {'stereo','scott'};
+names_nb = {'STEREO F=20','STEREO F=30','STEREO F=50','STEREO F=100','NaN',...
+    'SCOTT = [14,14,15]','SCOTT = [24,24,25]',...
+    'SCOTT = [30,30,16]','SCOTT = [40,40,6]','SCOTT = [58,58,6]'};
+ranks_nb = {'20','[14,14,15]';
+            '30','[24,24,25]';
+            '50','[30,30,16]';
+            '100','[40,40,6]';
+            '0','[58,58,6]';
+            };       
+c = 0;
+        
+ for i=1:size(methods_nb,2)
+     for j=1:size(ranks_nb,1)
+         c = c+1;
+         if ranks_nb{j,i}~="0"
+            tic,
+            eval(sprintf('[Y_hat,info] = %s(HSI, MSI, P1, P2, Pm, %s);', methods_nb{i},ranks_nb{j,i}));
+            time = toc;
+            eval('err = [compute_metrics(SRI,Y_hat,d1,d2), time];')
+            res{1,c} = cell2mat(err)';
+         else
+            res{1,c} = NaN*ones(1,5)';
+         end
+     end
+ end       
+ save_text_table('res_exp3.txt', names_nb, cell2mat(res));
 
-% R1 = [40,40,6]; R2 = [14,14,15]; R3 = [10,15,25];
-% R4 = [30,30,6]; R5 = [58,58,6];
-R1 = [40,40,6]; R2 = [30,30,16]; R3 = [24,24,25];
 
-% F = 20;
-% [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-% [~,~,~,Sa] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
-% erra = {nmse(SRI,Sa), SAM(SRI,Sa), ergas(SRI,Sa), r_snr(SRI,Sa), cc(SRI,Sa)};
-% F = 30;
-% [A0, B0, ~,~, C0] = tenRec(MSI, HSI, F, P1,P2,Pm);
-% [~,~,~,Sb] = stereo(1, F, A0,B0,C0, HSI, MSI, P1,P2,Pm, 10);
-% errb = {nmse(SRI,Sb), SAM(SRI,Sb), ergas(SRI,Sb), r_snr(SRI,Sb), cc(SRI,Sb)};
-F = 50;
-[S0,~] = stereo(HSI, MSI, P1, P2, Pm, F);
-err0 = compute_metrics(SRI,S0);
-F = 100;
-[~,~,~,S1] = stereo(HSI, MSI, P1, P2, Pm, F);
-err1 = compute_metrics(SRI,S1);
-
-[S2,~] = scott(HSI, MSI, P1, P2, Pm, R1);
-[S3,~] = scott(HSI, MSI, P1, P2, Pm, R2);
-[S4,~] = scott(HSI, MSI, P1, P2, Pm, R3);
-% [S5,~] = scott(HSI, MSI, P1, P2, Pm, R4);
-% [S6,~] = scott(HSI, MSI, P1, P2, Pm, R5);
-
-
-%% MAKE TABLE FROM RESULTS
-
-errH = load('metrics_hs_ip'); %This is obtained from Hysure and it must contain the same metrics
-
- T2 = [% real([erra{4}(end) erra{1}(end) erra{5}(end) erra{2}(end) erra{3}(end)]);
-%     real([errb{4}(end) errb{1}(end) errb{5}(end) errb{2}(end) errb{3}(end)]);
-    real([err0{4}(end) err0{1}(end) err0{5}(end) err0{2}(end) err0{3}(end)]);
-    real([err1{4}(end) err1{1}(end) err1{5}(end) err1{2}(end) err1{3}(end)]);
-    err2{6} err2{2} err2{3} err2{4} err2{5};
-    err3{6} err3{2} err3{3} err3{4} err3{5};
-    err4{6} err4{2} err4{3} err4{4} err4{5};
-%     err5{6} err5{2} err5{3} err5{4} err5{5};
-%     err6{6} err6{2} err6{3} err6{4} err6{5};
-    cell2mat(errH.err_hysure_ip);
-%     cell2mat(errH.err);
-%     cell2mat(errC.err)]; 
-];
-T2 = table(T2);
-writetable(T2, 'exp3_table2_ip')
 

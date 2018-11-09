@@ -30,7 +30,7 @@ if ~isfield(opts,'CPD_Niter') || isempty(opts.CPD_Niter)
     opts.CPD_Niter = 25;
 end
 if ~isfield(opts,'factors') || isempty(opts.factors)
-    [A, B, ~,~, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks, opts);
+    [A, B, ~,~, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks);
 end
 
 opts2.POSDEF = true; opts2.SYM = true;

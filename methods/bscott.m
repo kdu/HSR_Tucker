@@ -1,4 +1,4 @@
-function [SRI_hat,info] = bscott(MSI,HSI,R,Pm,opts)
+function [SRI_hat,info] = bscott(MSI,HSI,Pm,R,opts)
 
 % BSCOTT runs the BSCOTT algorithm for specified rank R
 % [SRI_hat,info] = BSCOTT(MSI,HSI,R,Pm,opts) returns 

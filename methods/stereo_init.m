@@ -1,4 +1,4 @@
-function [A, B, A_tilde, B_tilde, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks, opts)
+function [A, B, A_tilde, B_tilde, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks)
 
 % STEREO_INIT initialization of STEREO
 % [A, B, A_tilde, B_tilde, C] = STEREO_INIT((MSI, HSI, P1, P2, Pm, ranks, opts)
@@ -24,7 +24,7 @@ function [A, B, A_tilde, B_tilde, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks, 
 % Contact: clemence.prevost@univ-lorraine.fr
 
 
-options.MaxIter = opts.CPD_Niter; %options.Display = true;
+options.MaxIter = 25; %options.Display = true;
 U = cpd(MSI,ranks,options);
 A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));
 
