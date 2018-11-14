@@ -26,19 +26,17 @@ if ~isfield(opts,'Nblocks') || isempty(opts.Nblocks)
     opts.Nblocks = [1,1];
 end
 
-step_MSI = size(MSI); step_MSI = step_MSI(1:2) ./ opts.Nblocks ;
-step_HSI = size(HSI); step_HSI = step_HSI(1:2) ./ opts.Nblocks ;
+options.MaxIter = 25;
+step_MSI = size(MSI); step_HSI = size(HSI);
+step_MSI = step_MSI(1:2) ./ opts.Nblocks; step_HSI = step_HSI(1:2) ./ opts.Nblocks;
+step_MSI = floor(step_MSI); step_HSI = floor(step_HSI);
 SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
-
-for i1=1:opts.Nblocks(1)
-  for i2=1:opts.Nblocks(2) 
-    %options.Display = true;  
-    options.MaxIter = 25; %options.Display = true;
-    U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), F,options);
-    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));
-
+for i1=1:opts.Nblocks(1)-1
+  for i2=1:opts.Nblocks(2)-1
+      U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
+                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), F, options); % hosvd
+      A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));    
     [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
                                 (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R);
     T = (Pm * W_H) \ C_tilde;
@@ -47,7 +45,45 @@ for i1=1:opts.Nblocks(1)
     SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
             (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = cpdgen({A,B,C}); 
   end
-end 
+end
+
+for i2 = 1:opts.Nblocks(2)-1
+    U = cpd(MSI(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
+                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), R); % hosvd
+    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));   
+    [W_H, ~, ~] = svds(tens2mat(HSI(1+(opts.Nblocks(1)-1)*step_HSI(1):size(HSI,1), ...
+                                (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R);
+    T = (Pm * W_H) \ C_tilde;
+
+    C = W_H * T;
+    SRI_hat(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
+            (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = cpdgen({A,B,C}); 
+end
+
+for i1 = 1:opts.Nblocks(1)-1
+    U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
+                         1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :), R); % hosvd
+    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));       
+    [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
+                                1+(opts.Nblocks(2)-1)*step_HSI(2):size(HSI,2), :),3,[]), R);
+    T = (Pm * W_H) \ C_tilde;
+
+    C = W_H * T;
+    SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
+            1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :) = cpdgen({A,B,C}); 
+end
+
+
+    U = cpd(MSI(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
+                         1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :), R); % hosvd
+    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));   
+    [W_H, ~, ~] = svds(tens2mat(HSI(1+(opts.Nblocks(1)-1)*step_HSI(1):size(HSI,1), ...
+                                1+(opts.Nblocks(2)-1)*step_HSI(2):size(HSI,2), :),3,[]), R);
+    T = (Pm * W_H) \ C_tilde;
+
+    C = W_H * T;
+    SRI_hat(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
+           1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :) = cpdgen({A,B,C});
 
 info.steps = {step_MSI,step_HSI};
 info.factors = {A,B,C};
