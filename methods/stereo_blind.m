@@ -45,29 +45,29 @@ Ym1 = tens2mat(MSI,[],1); Ym2 = tens2mat(MSI,[],2); Ym3 = tens2mat(MSI,[],3);
 
 for n = 1:opts.Niter
 
-    disp('C...')
+    %disp('C...')
     mat1 = kr(B,A); mat2 = kr(B_tilde,A_tilde);
     R = opts.lambda*Pm'*Ym3'*mat1 + Yh3'*mat2;
     Q = opts.lambda*kron((B'*B).*(A'*A), Pm'*Pm) + kron((B_tilde'*B_tilde).*(A_tilde'*A_tilde), eye(size(Pm,2)));
     C = reshape(linsolve(Q, R(:), options),[size(Pm,2) F]);
     
-    disp('A tilde...')
+    %disp('A tilde...')
     R = Yh1'*kr(C,B_tilde);
     Q = kron((C'*C).*(B_tilde'*B_tilde), eye(size(A_tilde,1)));
     A_tilde = reshape(linsolve(Q, R(:), options),[size(HSI,1) F]); 
     
-    disp('B tilde...')
+    %disp('B tilde...')
     R = Yh2'*kr(C,A_tilde);
     Q = kron((C'*C).*(A_tilde'*A_tilde), eye(size(B_tilde,1)));
     B_tilde = reshape(linsolve(Q, R(:), options),[size(HSI,2) F]);
     
-    disp('A...')
+    %disp('A...')
     mat1 = Pm*C;
     R = Ym1'*kr(mat1,B);
     Q = kron((mat1'*mat1).*(B'*B), eye(size(MSI,1))); 
     A = reshape(linsolve(Q, R(:), options),[size(MSI,1) F]);
     
-    disp('B...')
+    %disp('B...')
     mat1 = Pm*C;
     R = Ym2'*kr(mat1,A);
     Q = kron((mat1'*mat1).*(A'*A), eye(size(B,1)));

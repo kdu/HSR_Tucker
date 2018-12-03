@@ -40,19 +40,19 @@ Ym1 = tens2mat(MSI,[],1); Ym2 = tens2mat(MSI,[],2); Ym3 = tens2mat(MSI,[],3);
 
 for n = 1:opts.Niter
     
-    disp('A...')
+    %disp('A...')
     R = opts.lambda*Ym1'*kr(Pm*C,B) + P1'*Yh1'*kr(C,P2*B);
     Q = opts.lambda*kron(((Pm*C)'*(Pm*C)).*(B'*B), eye(size(P1,2))) + kron((C'*C).*((P2*B)'*(P2*B)), P1'*P1);
     A = reshape(linsolve(Q, R(:), opts2),[size(P1,2) ranks]);
     %A = reshape(Q\R(:),[size(P1,2) ranks]);
     
-    disp('B...')
+    %disp('B...')
     R = opts.lambda*Ym2'*kr(Pm*C,A) + P2'*Yh2'*kr(C,P1*A);
     Q = opts.lambda*kron(((Pm*C)'*(Pm*C)).*(A'*A), eye(size(P2,2))) + kron((C'*C).*((P1*A)'*(P1*A)), P2'*P2);
     B = reshape(linsolve(Q, R(:), opts2),[size(P2,2) ranks]);
     %B = reshape(Q\R(:),[size(P2,2) ranks]);
     
-    disp('C...')
+    %disp('C...')
     R = opts.lambda*Pm'*Ym3'*kr(B,A) + Yh3'*kr(P2*B,P1*A);
     Q = opts.lambda*kron((B'*B).*(A'*A), Pm'*Pm) + kron(((P2*B)'*(P2*B)).*((P1*A)'*(P1*A)), eye(size(Pm,2)));
     C = reshape(linsolve(Q, R(:), opts2),[size(Pm,2) ranks]);
