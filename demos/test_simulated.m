@@ -159,81 +159,12 @@ d1 = 4; d2 = 4; q = 9;
 HSI_true = tmprod(tmprod(X,P1,1),P2,2);
 
 
-%%
-snr_stereo = []; %MSI = MSI_true; HSI = HSI_true;
-for n=1:1
-    
-    for k=1:size(MSI_true,3)
-        MSI(:,:,k) = awgn(MSI_true(:,:,k),60);
-    end
-    for k=1:size(HSI_true,3)
-        HSI(:,:,k) = awgn(HSI_true(:,:,k),60);
-    end
-    
-    Niter = 10; lambda = 1; 
-    for F=1:50
-        F
-        [SRI_hat, ~] = stereo3( HSI, MSI, P1,P2,Pm, F);
-        SRI_hat = real(SRI_hat); snr_stereo(F,n) = r_snr(X,SRI_hat);
-    end
-    
-    for i=1:70
-        for j=1:10
-            R = [i,i,j]
-            [SRI_hat,~] = scott(HSI, MSI, P1, P2, Pm, R);
-            snr_scott(i,j) = r_snr(X,SRI_hat);
-        end
-    end
-
-end
-
-%%
-
-snr_stereo = []; %MSI = MSI_true; HSI = HSI_true;
-for n=1:10
-    
-    for k=1:size(MSI_true,3)
-        MSI(:,:,k) = awgn(MSI_true(:,:,k),Inf);
-    end
-    for k=1:size(HSI_true,3)
-        HSI(:,:,k) = awgn(HSI_true(:,:,k),Inf);
-    end
-    
-    Niter = 10; lambda = 1; 
-    for F=1:50
-        F
-        [SRI_hat, ~] = stereo3( HSI, MSI, P1,P2,Pm, F);
-        SRI_hat = real(SRI_hat); snr_stereo(F,n) = r_snr(X,SRI_hat);
-    end
-    
-    for i=1:100
-        if i<=size(HSI,1)
-            R = [i,i,size(MSI,3)]
-            [SRI_hat,~] = scott(HSI, MSI, P1, P2, Pm, R);
-            snr_scott(i,n) = r_snr(X,SRI_hat);
-        else
-            snr_scott(i,n) = NaN;
-        end
-    end
-
-end
-
-
- %% MAKE PLOTS
- 
-% figure(1)
-% for i=1:size(snr_stereo,2)
-%     plot(snr_stereo(:,i))
-%     hold on
-% end
-% xlabel('F'); ylabel('SNR (dB)')
-% figure(2)
-% surfc(1:10,1:68,snr_scott)
-% xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('SNR (dB)')
-figure(1)
-boxplot(snr_stereo')
-figure(2)
-boxplot(snr_scott(1:size(HSI,1),:)')
+%     for k=1:size(MSI_true,3)
+%         MSI(:,:,k) = awgn(MSI_true(:,:,k),Inf);
+%     end
+%     for k=1:size(HSI_true,3)
+%         HSI(:,:,k) = awgn(HSI_true(:,:,k),Inf);
+%     end
 
 
 %% RUN SCOTT AUTOMATICALLY
@@ -327,4 +258,119 @@ for i=1:4
 
 
 end
+
+%% PLOT LOG OF SINGULAR VALUES
+
+lvl = ["20","35","60","Inf"];
+param = [2,6; 3,2; 4,2; 6,4];
+
+for i=1:4
+    for j=1:4
+        eval(sprintf('load(''data_%dS%dB%sdB.mat'')',param(i,1),param(i,2),lvl(j)))
+        
+        figure
+        subplot(1,3,1)
+            plot(log(svd(tens2mat(MSI,1,[]))))
+            title(sprintf('SVD 1st mode MSI, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+        subplot(1,3,2)
+            plot(log(svd(tens2mat(MSI,2,[]))))
+            title(sprintf('SVD 2nd mode MSI, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+        subplot(1,3,3)
+            plot(log(svd(tens2mat(HSI,3,[]))))
+            title(sprintf('SVD 3rd mode HSI, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+        
+      
+    end
+end
+
+%% BLIND ALGORITHMS
+
+lvl = ["20","35","60"];
+param = [2,6; 3,2; 4,2; 6,4];
+Niter = 10; lambda = 1; opts.Nblocks = [4,4];
+
+for i=1:4
+    for j=1:3
+        snr_stereo_blind = []; snr_scott_blind = [];
+        eval(sprintf('load(''data_%dS%dB%sdB.mat'')',param(i,1),param(i,2),lvl(j)))
+        
+        for F=1:30
+            F
+            [SRI_hat, ~] = stereo_blind(HSI, MSI,Pm, F);
+            SRI_hat = real(SRI_hat); snr_stereo_blind(F,1) = r_snr(X,SRI_hat);
+        end
+        
+        figure
+        plot(1:30,snr_stereo_blind)
+        xlabel('F'); ylabel('SNR (dB)')
+        title(sprintf('BLIND STEREO, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+        savefig(gcf, sprintf('SNR_BCP%dM%sdB',param(i,1),lvl(j)))
+    
+        for r1=1:size(HSI,1)
+            for r3=1:size(MSI,3)
+                R = [r1,r1,r3]
+                [SRI_hat,~] = bscott(MSI, HSI, Pm,R,opts);
+                snr_scott_blind(r1,r3) = r_snr(X,SRI_hat);
+            end
+        end
+        
+        figure
+        surfc(1:size(MSI,3),1:size(HSI,1),snr_scott_blind)
+        xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('SNR (dB)')
+        title(sprintf('BSCOTT, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+        savefig(gcf, sprintf('SNR_BSVD%dM%sdB',param(i,1),lvl(j)))
+        
+        
+    end
+end
+
+%% BLIND CASE WHERE SNR = Inf
+
+param = [2,6; 3,2; 4,2; 6,4]; opts.Nblocks = [4,4];
+
+for i=1:4
+    snr_stereo_blind = []; snr_scott_blind = [];
+    eval(sprintf('load(''data_%dS%dBInfdB.mat'')',param(i,1),param(i,2)))
+    
+
+        for F=1:30
+            F
+            try
+            [SRI_hat, ~] = stereo_blind(HSI, MSI,Pm, F);
+            SRI_hat = real(SRI_hat); snr_stereo_blind(F,1) = r_snr(X,SRI_hat);
+            catch
+                snr_stereo_blind(F,1) = NaN;
+                continue
+            end
+        end
+        
+        figure
+        plot(1:30,snr_stereo_blind)
+        xlabel('F'); ylabel('SNR (dB)'); xlim([1 30])
+        title(sprintf('BLIND STEREO, %d sources, Km=%d, Inf dB noise',param(i,1),param(i,2)))
+        savefig(gcf, sprintf('SNR_BCP%dMInfdB',param(i,1)))
+        
+        for r1=1:size(HSI,1)
+            for r3=1:size(MSI,3)
+                R = [r1,r1,r3]
+                try
+                [SRI_hat,~] = bscott(MSI, HSI, Pm,R,opts);
+                snr_scott_blind(r1,r3) = r_snr(X,SRI_hat);
+                catch
+                    snr_scott_blind(r1,r3) = NaN;
+                    continue
+                end
+            end
+        end
+        
+        figure
+        surfc(1:size(MSI,3),1:size(HSI),snr_scott_blind)
+        xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('SNR (dB)')
+        title(sprintf('BSCOTT, %d sources, Km=%d, Inf dB noise',param(i,1),param(i,2)))
+        savefig(gcf, sprintf('SNR_BSVD%dMInfdB',param(i,1)))
+
+
+
+end
+
 
