@@ -286,9 +286,46 @@ for i=1:4
             plot(x(1:30),'-s','MarkerFaceColor','red','MarkerSize',2,'MarkerEdgeColor','red')
             title(sprintf('3rd mode HSI, %d mat., Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
             
-            sgtitle(sprintf('Log of singular values, %d materials',param(i,1)))
+            %sgtitle(sprintf('Log of singular values, %d materials',param(i,1)))
         
       
+    end
+end
+
+%% PLOT LOG OF SINGULAR VALUES 2
+
+lvl = ["20","35","60","Inf"];
+param = [2,6; 3,2; 4,2; 6,4];
+leg = {'20dB SNR', '35dB SNR','60dB SNR','Inf. SNR'};
+
+for i=1:4
+    figure(i)
+    %sgtitle(sprintf('Log of singular values, %d materials, Km=%d',param(i,1),param(i,2)))
+    for j=1:4
+        eval(sprintf('load(''data_%dS%dB%sdB.mat'')',param(i,1),param(i,2),lvl(j)))
+        
+        
+       subplot(1,3,1)
+        x = log(svd(tens2mat(MSI,1,[])));
+        ylim auto
+        plot(x(1:10),'-s','MarkerSize',3)
+        title('1st unfolding MSI')
+        legend(leg(1:j))
+        hold on
+       subplot(1,3,2)
+        x = log(svd(tens2mat(MSI,2,[])));
+        ylim auto
+        plot(x(1:10),'-s','MarkerSize',3)
+        title('2nd unfolding MSI')
+        legend(leg(1:j))
+        hold on
+       subplot(1,3,3)
+        x = log(svd(tens2mat(HSI,3,[])));
+        ylim auto
+        plot(x(1:10),'-s','MarkerSize',3)
+        title('3rd unfolding HSI')
+        legend(leg(1:j))
+        hold on
     end
 end
 
