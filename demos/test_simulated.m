@@ -265,19 +265,28 @@ lvl = ["20","35","60","Inf"];
 param = [2,6; 3,2; 4,2; 6,4];
 
 for i=1:4
+    figure(i)
     for j=1:4
         eval(sprintf('load(''data_%dS%dB%sdB.mat'')',param(i,1),param(i,2),lvl(j)))
         
-        figure
-        subplot(1,3,1)
-            plot(log(svd(tens2mat(MSI,1,[]))))
-            title(sprintf('SVD 1st mode MSI, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
-        subplot(1,3,2)
-            plot(log(svd(tens2mat(MSI,2,[]))))
-            title(sprintf('SVD 2nd mode MSI, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
-        subplot(1,3,3)
-            plot(log(svd(tens2mat(HSI,3,[]))))
-            title(sprintf('SVD 3rd mode HSI, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+        
+        subplot(4,3,3*j-2)
+            x = log(svd(tens2mat(MSI,1,[])));
+            ylim auto
+            plot(x(1:30),'-s','MarkerFaceColor','red','MarkerSize',2,'MarkerEdgeColor','red')
+            title(sprintf('1st mode MSI, %d mat., Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
+        subplot(4,3,3*j-1)
+            x = log(svd(tens2mat(MSI,2,[])));
+            ylim auto
+            plot(x(1:30),'-s','MarkerFaceColor','red','MarkerSize',2,'MarkerEdgeColor','red')
+            title(sprintf('2nd mode MSI, %d mat., Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
+        subplot(4,3,3*j)
+            x = log(svd(tens2mat(HSI,3,[])));
+            ylim auto
+            plot(x(1:30),'-s','MarkerFaceColor','red','MarkerSize',2,'MarkerEdgeColor','red')
+            title(sprintf('3rd mode HSI, %d mat., Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
+            
+            sgtitle(sprintf('Log of singular values, %d materials',param(i,1)))
         
       
     end
