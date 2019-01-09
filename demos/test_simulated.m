@@ -164,44 +164,53 @@ HSI_true = tmprod(tmprod(X,P1,1),P2,2); HSI=HSI_true;
 
 lvl = ["20","35","60"];
 %param = [2,6; 3,2; 4,2; 6,4];
-param = [6,4; 6,6];
+param = [3,2; 4,2; 6,4];
 Niter = 10; lambda = 1; 
 
 for i=1:4
     for j=1:3
-        snr_stereo = []; snr_scott = [];
+        cost1 = [NaN*ones(param(i,1)-1,1)]; cost2 = [NaN*ones(size(HSI,1)+10,param(i,1)-1)];% snr_stereo = []; snr_scott = [];
         eval(sprintf('load(''data_%dS%dB%sdB.mat'')',param(i,1),param(i,2),lvl(j)))
         
-        for F=1:25
-            F
-            [SRI_hat2, ~] = stereo3(HSI, MSI, P1,P2,Pm, F);
-            SRI_hat2 = real(SRI_hat2); snr_stereo(F,1) = r_snr(X,SRI_hat2);
-        end
-        
-        
-        figure
-        plot(1:25,snr_stereo)
-        xlabel('F'); ylabel('SNR (dB)')
-        title(sprintf('STEREO, %d sources, Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
-        savefig(gcf, sprintf('SNR_CP%dM%sdB',param(i,1),lvl(j)))
+%         for F=param(i,1):25
+%             F
+%             [~, info] = stereo3(HSI, MSI, P1,P2,Pm, F);
+%             %SRI_hat2 = real(SRI_hat2); snr_stereo(F,1) = r_snr(X,SRI_hat2);
+%             cost1(F,1) = cost_stereo(info.factors, HSI, MSI, lambda, P1,P2,Pm);
+%             
+%         end
+%         
+%         
+%         
+%         figure
+% %         plot(1:25,snr_stereo)
+% %         xlabel('F'); ylabel('SNR (dB)')
+% %         title(sprintf('STEREO, %d sources, Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
+% %         savefig(gcf, sprintf('SNR_CP%dM%sdB',param(i,1),lvl(j)))
+%         plot(1:25,cost1)
+%         xlabel('F'); ylabel('Value of cost function')
+%         title(sprintf('STEREO, %d sources, Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
+%         savefig(gcf, sprintf('cost_CP%dM%sdB',param(i,1),lvl(j)))
     
         for r1=1:size(HSI,1)+10
-            for r3=1:10
+            for r3=param(i,1):10
                 R = [r1,r1,r3]
-                [SRI_hat2,~] = scott(HSI, MSI, P1, P2, Pm, R);
-                snr_scott(r1,r3) = r_snr(X,SRI_hat2);
+                [~,info] = scott(HSI, MSI, P1, P2, Pm, R);
+                %snr_scott(r1,r3) = r_snr(X,SRI_hat2);
+                cost2(r1,r3) = cost_scott(info.factors,info.core, HSI, MSI, lambda, P1,P2,Pm);
                 
                 if (r3>size(MSI,3) && r1>size(HSI,1))%identifiability
-                     snr_scott(r1,r3) = NaN;
+                     cost2(r1,r3) = NaN; %snr_scott(r1,r3) = NaN;
                 end
             end
         end
         
+        cost2(1:param(i,1)-1,:) = NaN;
         figure
-        surfc(1:10,1:size(HSI,1)+10,snr_scott)
-        xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('SNR (dB)')
+        surfc(1:10,1:size(HSI,1)+10,cost2)
+        xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('Value of cost function')
         title(sprintf('SCOTT, %d sources, Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
-        savefig(gcf, sprintf('SNR_SVD%dM%sdB',param(i,1),lvl(j)))
+        savefig(gcf, sprintf('cost_SVD%dM%sdB',param(i,1),lvl(j)))
         
            
     end
@@ -424,8 +433,8 @@ end
 %% MAKE DOUBLE FIGURES
 
 % Load saved figures
-a=hgload('SNR_CP6MInfdB.fig');
-b=hgload('SNR_SVD6MInfdB.fig');
+a=hgload('BP_CP6M35dB.fig');
+b=hgload('BP_SVD6M35dB6Rs.fig');
 % c=hgload('SNR_CP2M35dB.fig');
 % d=hgload('SNR_SVD2M35dB.fig');
 % e=hgload('SNR_CP2M60dB.fig');
@@ -434,7 +443,7 @@ b=hgload('SNR_SVD6MInfdB.fig');
 figure
 %sgtitle('SNR between groundtruth and estimate, 2 mat., Km=6, SNR=20dB')
 h(1)=subplot(1,2,1); title('STEREO'); xlabel('F')
-h(2)=subplot(1,2,2); title('SCOTT'); xlabel('R_3'); ylabel('R_1=R_2')
+h(2)=subplot(1,2,2); title('SCOTT'); xlabel('R_1=R_2')
 % h(3)=subplot(3,2,3);
 % h(4)=subplot(3,2,4);
 % h(5)=subplot(3,2,5);
@@ -449,17 +458,18 @@ copyobj(allchild(get(b,'CurrentAxes')),h(2));
 
 %% MAKE BOXPLOTS
 
-lvl = ["20","35","60"];
-%param = [2,6; 3,2; 4,2; 6,4];
+lvl = "35"; %lvl = ["20","35","60"];
+%param = [2,6; 3,2; 4,2; 6,4]; PENSER A FAIRE 4M
 param = [6,4;];
 Niter = 10; lambda = 1; Nreal = 10;
 
-for i=1:3
-    for j=1:3
+for i=1:length(param)
+    for j=1:length(lvl)
         
         eval(sprintf('load(''rawdata_%dS%dB.mat'')',param(i,1),param(i,2)))
         MSI_true = MSI; HSI_true = HSI;
-        R3 = size(MSI_true,3);%R3 = [param(i,1) param(i,2)];
+        R3 = param(i,1);%R3 = [param(i,1) param(i,2)];
+        snr_scott = zeros(Nreal,size(HSI,1)+10);
         
         for n = 1:Nreal
             
@@ -479,15 +489,15 @@ for i=1:3
             end
             
             
-            for r1=1:size(HSI,1)+10
-                R = [r1,r1,R3]
-                [SRI_hat2,~] = scott(HSI, MSI, P1, P2, Pm, R);
-                snr_scott(n,r1) = r_snr(X,SRI_hat2);
-
-                if (R3>size(MSI,3) && r1>size(HSI,1))%identifiability
-                     snr_scott(n,r1) = NaN;
-                end
-            end          
+%             parfor r1=1:size(HSI,1)+10
+%                 R = [r1,r1,R3]
+%                 [SRI_hat2,~] = scott(HSI, MSI, P1, P2, Pm, R);
+%                 snr_scott(n,r1) = r_snr(X,SRI_hat2);
+% 
+%                 if (R3>size(MSI,3) && r1>size(HSI,1))%identifiability
+%                      snr_scott(n,r1) = NaN;
+%                 end
+%             end          
         end
         
         figure
@@ -495,12 +505,12 @@ for i=1:3
         xlabel('F');
         title(sprintf('STEREO, %d sources, Km=%d, %sdB SNR',param(i,1),param(i,2),lvl(j)))
         savefig(gcf, sprintf('BP_CP%dM%sdB',param(i,1),lvl(j)))
-        
-        figure
-        boxplot(snr_scott)
-        xlabel('R_1 = R_2');
-        title(sprintf('SCOTT, %d sources, Km=%d, %sdB SNR, R_3 = %d',param(i,1),param(i,2),lvl(j),R3))
-        savefig(gcf, sprintf('BP_SVD%dM%sdB%dRs',param(i,1),lvl(j),R3))
+%         
+%         figure
+%         boxplot(snr_scott)
+%         xlabel('R_1 = R_2');
+%         title(sprintf('SCOTT, %d sources, Km=%d, %sdB SNR, R_3 = %d',param(i,1),param(i,2),lvl(j),R3))
+%         savefig(gcf, sprintf('BP_SVD%dM%sdB%dRs',param(i,1),lvl(j),R3))
 
            
     end
@@ -508,58 +518,133 @@ end
 
 %% FIGURES OF SPECTRAL BANDS 
 
-% FIND ORIGINAL SPECTRUM FOR MATERIAL 1
-SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
-SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
-SRI(1,:,:) = []; SRI(:,1,:) = [];
-load('Indian_pines_gt.mat'); indian_pines_gt(:,1) = []; indian_pines_gt(1,:) = [];
-mat = tens2mat(SRI,3,[]);
-ind = find(reshape(indian_pines_gt,1,[]) == 3);
-s1 = real(mean(mat(:,ind),2)); 
+% %FIND ORIGINAL SPECTRUM FOR MATERIAL 1
+% SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
+% SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
+% SRI(1,:,:) = []; SRI(:,1,:) = [];
+% load('Indian_pines_gt.mat'); indian_pines_gt(:,1) = []; indian_pines_gt(1,:) = [];
+% mat = tens2mat(SRI,3,[]);
+% ind = find(reshape(indian_pines_gt,1,[]) == 3);
+% s1 = real(mean(mat(:,ind),2)); 
 
 % RUN ALGORITHMS
 load('data_6S4BInfdB.mat')
 F = 25; R = [6,6,6];
-[SRI_hat1, ~] = stereo3(HSI, MSI, P1,P2,Pm, F);
+[SRI_hat1, info1] = stereo3(HSI, MSI, P1,P2,Pm, F);
 SRI_hat1 = real(SRI_hat1);
 r_snr(X,SRI_hat1)
-[SRI_hat2, ~] = scott(HSI, MSI, P1, P2, Pm, R);
+[SRI_hat2, info2] = scott(HSI, MSI, P1, P2, Pm, R);
 r_snr(X,SRI_hat2)
+
+C = info1.factors{3}; W = info2.factors{3}; 
+theta = subspace(C,W)
 
 err1 = zeros(1,200); err2 = err1;
 for k=1:size(X,3)
-    err1(1,k) = norm(X(1:40,1:40,k)-SRI_hat1(1:40,1:40,k),'fro');
-    err2(1,k) = norm(X(1:40,1:40,k)-SRI_hat2(1:40,1:40,k),'fro');
+    err1(1,k) = norm(X(:,:,k)-SRI_hat1(:,:,k),'fro');
+    err2(1,k) = norm(X(:,:,k)-SRI_hat2(:,:,k),'fro');
 end
     
 ind = find(err1 == max(err1));
 % find(err2 == max(err2))
 
 % MAKE PLOTS
-figure(1)
-subplot(1,3,1)
-    imagesc(X(1:40,1:40,ind))
-    title('Groundtruth SRI')
-subplot(1,3,2)
-    imagesc(SRI_hat1(1:40,1:40,ind))
-    title('STEREO')
-subplot(1,3,3)
-    imagesc(SRI_hat2(1:40,1:40,ind))
-    title('SCOTT')
-
+% figure(1)
+% subplot(1,3,1)
+%     imagesc(X(1:40,1:40,ind))
+%     title('Groundtruth SRI')
+% subplot(1,3,2)
+%     imagesc(SRI_hat1(1:40,1:40,ind))
+%     title('STEREO')
+% subplot(1,3,3)
+%     imagesc(SRI_hat2(1:40,1:40,ind))
+%     title('SCOTT')
+% 
 figure(2)
-plot(err1)
+plot(err1,'Linewidth',1)
 hold on
-plot(err2)
-% hold on 
-% plot(s1'/1000)
+plot(err2,'Linewidth',1)
+legend('STEREO','SCOTT')
+% % hold on 
+% % plot(s1'/1000)
     
+%% TEST FOR SVD - SEMI-REAL DATA
 
+%%%%%%%%%%%
+% LOAD INDIAN PINES DATASET % 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
+% SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
+% SRI(1,:,:) = []; SRI(:,1,:) = [];
+% Pm = spectral_deg(SRI,"LANDSAT");
+% MSI = tmprod(SRI,Pm,3);
+% d1 = 4; d2 = 4; q = 9;
+% [P1,P2] = spatial_deg(SRI, q, d1, d2);
+% HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
+%%%%%%%%%%%
+% LOAD SALINAS DATASET % 
+%%%%%%%%%%%%%%%%%%%%%%%%
+% SRI = cell2mat(struct2cell(load('Salinas.mat')));
+% SRI = crop(SRI,[80,84,size(SRI,3)]);
+% SRI(:,:,[108:112 154:167 224]) = []; %Regions of water absorption (Salinas)
+% Pm = spectral_deg(SRI,"LANDSAT");
+% MSI = tmprod(SRI,Pm,3);
+% d1 = 4; d2 = 4; q = 9;
+% [P1,P2] = spatial_deg(SRI, q, d1, d2);
+% HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
+%%%%%%%%%%%
+% LOAD PAVIA DATASET % 
+%%%%%%%%%%%%%%%%%%%%%%
+% SRI = cell2mat(struct2cell(load('PaviaU.mat')));
+% Pm = spectral_deg(SRI,"Quickbird");
+% MSI = tmprod(SRI,Pm,3);
+% d1 = 4; d2 = 4; q = 9;
+% [P1,P2] = spatial_deg(SRI, q, d1, d2);
+% HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
+%%%%%%%%%%%
+% LOAD CUPRITE DATASET % 
+%%%%%%%%%%%%%%%%%%%%%%%%
+SRI = double(cell2mat(struct2cell(load('Cuprite.mat'))));
+Pm = spectral_deg(SRI,"LANDSAT");
+MSI = tmprod(SRI,Pm,3);
+d1 = 4; d2 = 4; q = 9;
+[P1,P2] = spatial_deg(SRI, q, d1, d2);
+HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
+figure
+subplot(1,3,1)
+x = log(svd(tens2mat(MSI,1,[])));
+plot(x)
+subplot(1,3,2)
+x = log(svd(tens2mat(MSI,2,[])));
+plot(x)
+subplot(1,3,3)
+x = log(svd(tens2mat(HSI,3,[])));
+plot(x)
 
+%% TEST ON CURVATURE
 
+lambda = 1;
+for r1=1:size(HSI,1)+10
+    for r3=1:10
+        R = [r1,r1,r3]
+        [SRI_hat2,info] = scott(HSI, MSI, P1, P2, Pm, R);
+        cost2(r1,r3) = cost_scott(info.factors,info.core, HSI, MSI, lambda, P1,P2,Pm);
+        snr_scott(r1,r3) = r_snr(X,SRI_hat2);
+        if not((r3<=size(MSI,3) || r1<=size(HSI,1)) && (r1<=min(r3,size(MSI,3))*r1 && r3<=min(r1,size(HSI,1))^2))
+             cost2(r1,r3) = NaN; snr_scott(r1,r3) = NaN;
+        end
+    end
+end
 
+[X,Y] = meshgrid(1:10, 1:size(HSI,1)+10);
+[K,H] = surfature(X,Y,cost2); 
+figure
+surf(X,Y,cost2,H,'facecolor','interp'); 
+set(gca,'clim',[-1,1])
+figure
+surf(X,Y,snr_scott)
 
