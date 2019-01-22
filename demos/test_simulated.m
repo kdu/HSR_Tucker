@@ -342,44 +342,107 @@ end
 
 %% BLIND ALGORITHMS
 
-lvl = ["20","35","60"];
-param = [2,6; 3,2; 4,2; 6,4];
-Niter = 10; lambda = 1; opts.Nblocks = [4,4];
+lvl = "Inf"; %lvl = ["20","35","60"];
+%param = [2,6; 3,2; 4,2; 6,4]; 
+param = [6,4]; %lvl = "20";
+Niter = 10; lambda = 1; opts.Nblocks = [1,1]; opts2.Nblocks = [6,6];
 
-for i=1:4
-    for j=1:3
-        snr_stereo_blind = []; snr_scott_blind = [];
-        eval(sprintf('load(''data_%dS%dB%sdB.mat'')',param(i,1),param(i,2),lvl(j)))
+for i=1:length(param)
+    %for j=1:length(lvl)
+        snr_scuba = []; snr_scuba2 = []; snr_bscott = []; snr_bscott2 = [];
+        eval(sprintf('load(''data_%dS%dBInfdB.mat'')',param(i,1),param(i,2)))
         
-        for F=1:30
-            F
-            [SRI_hat2, ~] = stereo_blind(HSI, MSI,Pm, F);
-            SRI_hat2 = real(SRI_hat2); snr_stereo_blind(F,1) = r_snr(X,SRI_hat2);
-        end
-        
-        figure
-        plot(1:30,snr_stereo_blind)
-        xlabel('F'); ylabel('SNR (dB)')
-        title(sprintf('BLIND STEREO, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
-        savefig(gcf, sprintf('SNR_BCP%dM%sdB',param(i,1),lvl(j)))
-    
-        for r1=1:size(HSI,1)
+        for F=1:25
             for r3=1:size(MSI,3)
-                R = [r1,r1,r3]
-                [SRI_hat2,~] = bscott(MSI, HSI, Pm,R,opts);
-                snr_scott_blind(r1,r3) = r_snr(X,SRI_hat2);
+                [F r3]
+                %try
+                [SRI_hat, ~] = scuba(MSI, HSI,Pm, [F,r3], opts); 
+                [SRI_hat1, ~] = scuba(MSI, HSI,Pm, [F,r3], opts2);
+                snr_scuba(F,r3) = r_snr(X,SRI_hat); snr_scuba2(F,r3) = r_snr(X,SRI_hat1);
+                %catch
+                    %snr_scuba(F,r3) = NaN; snr_scuba2(F,r3) = NaN;
+                    %continue
+                %end
             end
         end
-        
+%         
         figure
-        surfc(1:size(MSI,3),1:size(HSI,1),snr_scott_blind)
-        xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('SNR (dB)')
-        title(sprintf('BSCOTT, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
-        savefig(gcf, sprintf('SNR_BSVD%dM%sdB',param(i,1),lvl(j)))
+        surf(1:size(MSI,3),1:25,snr_scuba,'FaceAlpha',0.6); colormap summer; freezeColors; hold on
+        surf(1:size(MSI,3),1:25,snr_scuba2,'FaceAlpha',0.6); colormap spring
+        xlabel('R_3'); ylabel('F'); zlabel('R-SNR (dB)'); legend('(1,1) blocks','(4,4) blocks')
+        title(sprintf('SCUBA, %d sources, Km=%d, Inf dB noise',param(i,1),param(i,2)))
+        %savefig(gcf, sprintf('SNR_BCP%dM%sdB',param(i,1),lvl(j)))
+%     
+%         for r1=1:40%+10
+%             for r3=1:size(MSI,3)
+%                 R = [r1,r1,r3]
+%                 [SRI_hat2,~] = bscott(MSI, HSI, Pm,R,opts);
+%                 [SRI_hat3,~] = bscott(MSI, HSI, Pm,R,opts2);
+%                 snr_bscott(r1,r3) = r_snr(X,SRI_hat2);
+%                 snr_bscott2(r1,r3) = r_snr(X,SRI_hat3);
+%                 if not((r3<=size(MSI,3) || r1<=size(HSI,1)) && (r1<=min(r3,size(MSI,3))*r1 && r3<=min(r1,size(HSI,1))^2))
+%                     snr_bscott(r1,r3) = NaN; snr_bscott2(r1,r3) = NaN;
+%                 end  
+%             end
+%         end
+%         
+%         figure
+%         surf(1:size(MSI,3),1:40,snr_bscott, 'FaceAlpha', 0.6); colormap summer; freezeColors; hold on
+%         surf(1:size(MSI,3),1:40,snr_bscott2, 'FaceAlpha',0.6); colormap spring
+%         xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('SNR (dB)'); legend('(1,1) blocks','(4,4) blocks')
+%         title(sprintf('BSCOTT, %d sources, Km=%d, %sdB noise',param(i,1),param(i,2),lvl(j)))
+%         savefig(gcf, sprintf('SNR_BSVD%dM%sdB',param(i,1),lvl(j)))
+      
         
-        
-    end
+    %end
 end
+
+%% VISUALIZE FIGURES - BLIND
+
+lvl = ["20","35","60"]; 
+F = 2; R = [6,6,4]; opts.Nblocks = [2,2];
+
+for i=1:length(lvl)
+    
+    
+    eval(sprintf('load(''data_2S6B%sdB.mat'')',lvl(i)))
+    
+    [SRI_hat1, ~] = scuba(MSI, HSI, Pm, [F,2], opts);
+    SRI_hat1 = real(SRI_hat1);
+    [SRI_hat2, ~] = bscott(MSI, HSI, Pm, R, opts);
+    
+    [nmse(X,SRI_hat1) nmse(X,SRI_hat2)]
+
+end
+
+%% TEST ON NUMBER OF BLOCKS
+
+lvl = ["20","35","60"];
+for j=1:length(lvl)
+    
+    eval(sprintf('load(''data_6S6B%sdB.mat'')',lvl(j)))
+    snr1 = []; snr2 = [];
+    for i=1:40
+        %for j=1:size(HSI,2)
+
+            [i,i]
+            opts.Nblocks = [i,i]; ranks1 = [7,6]; ranks2 = [6,6,6];
+            [SRI_hat1,~] = scuba(MSI, HSI, Pm,ranks1,opts);
+            snr1(i,1) = r_snr(X,SRI_hat1);
+            [SRI_hat2,~] = bscott(MSI, HSI, Pm,ranks2,opts);
+            snr2(i,1) = r_snr(X,SRI_hat2);
+
+        %end
+    end
+    
+    figure
+    subplot(1,2,1)
+    plot(snr1)
+    subplot(1,2,2)
+    plot(snr2)
+    savefig(gcf, sprintf('Nblocks_6M6B%sdB',lvl(j)))
+end
+
 
 %% BLIND CASE WHERE SNR = Inf
 
@@ -433,17 +496,18 @@ end
 %% MAKE DOUBLE FIGURES
 
 % Load saved figures
-a=hgload('BP_CP6M35dB.fig');
-b=hgload('BP_SVD6M35dB6Rs.fig');
-% c=hgload('SNR_CP2M35dB.fig');
+a=hgload('SNR_BCP2M20dB.fig');
+b=hgload('SNR_BSVD2M20dB.fig');
+% c=hgload('Nblocks_6M4B60dB.fig');
 % d=hgload('SNR_SVD2M35dB.fig');
 % e=hgload('SNR_CP2M60dB.fig');
 % f=hgload('SNR_SVD2M60dB.fig');
 % Prepare subplots
 figure
 %sgtitle('SNR between groundtruth and estimate, 2 mat., Km=6, SNR=20dB')
-h(1)=subplot(1,2,1); title('STEREO'); xlabel('F')
-h(2)=subplot(1,2,2); title('SCOTT'); xlabel('R_1=R_2')
+h(1)=subplot(1,2,1); xlabel('R_3'); ylabel('F'); zlabel('R-SNR (dB)'); legend('(1,1) blocks','(4,4) blocks')
+h(2)=subplot(1,2,2); xlabel('R_3'); ylabel('R_1 = R_2'); zlabel('R-SNR (dB)'); legend('(1,1) blocks','(4,4) blocks')
+%h(3)=subplot(1,3,3); xlabel('Number of blocks'); ylabel('R-SNR (dB)'); legend('SCUBA','BSCOTT')
 % h(3)=subplot(3,2,3);
 % h(4)=subplot(3,2,4);
 % h(5)=subplot(3,2,5);
@@ -451,10 +515,18 @@ h(2)=subplot(1,2,2); title('SCOTT'); xlabel('R_1=R_2')
 % Paste figures on the subplots
 copyobj(allchild(get(a,'CurrentAxes')),h(1));
 copyobj(allchild(get(b,'CurrentAxes')),h(2));
-% copyobj(allchild(get(c,'CurrentAxes')),h(3));
+%copyobj(allchild(get(c,'CurrentAxes')),h(3));
 % copyobj(allchild(get(d,'CurrentAxes')),h(4));
 % copyobj(allchild(get(e,'CurrentAxes')),h(5));
 % copyobj(allchild(get(f,'CurrentAxes')),h(6));
+
+
+% 
+% sp1 = findobj(subplot(1,2,1), 'Type', 'line');
+% sp2 = findobj(subplot(1,2,2), 'Type', 'line');
+% figure
+% plot(sp1.YData,'Linewidth',1); hold on; plot(sp2.YData,'Linewidth',1)
+% xlabel('Number of blocks in both dimensions'); ylabel('R-SNR (dB)'); legend('SCUBA','BSCOTT')
 
 %% MAKE BOXPLOTS
 
@@ -516,63 +588,101 @@ for i=1:length(param)
     end
 end
 
-%% FIGURES OF SPECTRAL BANDS 
+%% TABLES OF METRICS 
 
-% %FIND ORIGINAL SPECTRUM FOR MATERIAL 1
-% SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
-% SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
-% SRI(1,:,:) = []; SRI(:,1,:) = [];
-% load('Indian_pines_gt.mat'); indian_pines_gt(:,1) = []; indian_pines_gt(1,:) = [];
-% mat = tens2mat(SRI,3,[]);
-% ind = find(reshape(indian_pines_gt,1,[]) == 3);
-% s1 = real(mean(mat(:,ind),2)); 
+lvl = ["20","35","60","Inf"]; F = [2,2,2,3]; R = [2,2,2];
 
-% RUN ALGORITHMS
-load('data_6S4BInfdB.mat')
-F = 25; R = [6,6,6];
-[SRI_hat1, info1] = stereo3(HSI, MSI, P1,P2,Pm, F);
-SRI_hat1 = real(SRI_hat1);
-r_snr(X,SRI_hat1)
-[SRI_hat2, info2] = scott(HSI, MSI, P1, P2, Pm, R);
-r_snr(X,SRI_hat2)
-
-C = info1.factors{3}; W = info2.factors{3}; 
-theta = subspace(C,W)
-
-err1 = zeros(1,200); err2 = err1;
-for k=1:size(X,3)
-    err1(1,k) = norm(X(:,:,k)-SRI_hat1(:,:,k),'fro');
-    err2(1,k) = norm(X(:,:,k)-SRI_hat2(:,:,k),'fro');
+for i=1:length(lvl)
+    
+    eval(sprintf('load(''data_2S6B%sdB.mat'')',lvl(i)))
+    
+    tic; [SRI_hat1, ~] = stereo3(HSI, MSI, P1,P2,Pm, F(i)); t1=toc;
+    SRI_hat1 = real(SRI_hat1);
+    err1 = compute_metrics(X,SRI_hat1,4,4); err1 = [cell2mat(err1) t1];
+    tic; [SRI_hat2, ~] = scott(HSI, MSI, P1, P2, Pm, R); t2 = toc;
+    err2 = compute_metrics(X,SRI_hat2,4,4);  err2 = real([cell2mat(err2) t2]);
+    err1(3) = []; err2(3) = [];
+    T = [err1; err2]; save(sprintf('table_2S6B%sdB.txt',lvl(i)),'T','-ASCII')
+    
 end
-    
-ind = find(err1 == max(err1));
-% find(err2 == max(err2))
 
-% MAKE PLOTS
-% figure(1)
-% subplot(1,3,1)
-%     imagesc(X(1:40,1:40,ind))
-%     title('Groundtruth SRI')
-% subplot(1,3,2)
-%     imagesc(SRI_hat1(1:40,1:40,ind))
-%     title('STEREO')
-% subplot(1,3,3)
-%     imagesc(SRI_hat2(1:40,1:40,ind))
-%     title('SCOTT')
+
+
+% C = info1.factors{3}; W = info2.factors{3}; 
+% theta = subspace(C,W)
 % 
-figure(2)
-plot(err1,'Linewidth',1)
-hold on
-plot(err2,'Linewidth',1)
-legend('STEREO','SCOTT')
-% % hold on 
-% % plot(s1'/1000)
+% err1 = zeros(1,200); err2 = err1;
+% for k=1:size(X,3)
+%     err1(1,k) = norm(X(:,:,k)-SRI_hat1(:,:,k),'fro');
+%     err2(1,k) = norm(X(:,:,k)-SRI_hat2(:,:,k),'fro');
+% end
+      
+%% VISUALIZE FIGURES
+
+lvl = ["60"]; 
+%F = [2,2,2,3]; R = [2,2,2];
+%F = [6,10,13,25]; R = [6,6,4];
+opts.Nblocks = [1,1]; opts2.Nblocks = [6,6];
+
+for i=1:length(lvl)
     
+    eval(sprintf('load(''data_6S4B%sdB.mat'')',lvl(i)))
+    
+    tic; [SRI_hat1, ~] = scuba(MSI, HSI,Pm, [1,4], opts); t1 = toc;
+    %SRI_hat1 = real(SRI_hat1);
+    err1 = compute_metrics(X,SRI_hat1,4,4); err1 = [cell2mat(err1) t1];
+    
+    tic; [SRI_hat2, ~] = scuba(MSI, HSI,Pm, [1,2], opts2); t2 = toc;
+    err2 = compute_metrics(X,SRI_hat2,4,4); err2 = [cell2mat(err2) t2];
+    
+    tic; [SRI_hat3,~] = bscott(MSI, HSI, Pm,[6,6,4],opts); t3 = toc;
+    err3 = compute_metrics(X,SRI_hat3,4,4); err3 = [cell2mat(err3) t3];
+    
+    tic; [SRI_hat4,~] = bscott(MSI, HSI, Pm,[2,2,2],opts2); t4 = toc;
+    err4 = compute_metrics(X,SRI_hat4,4,4); err4 = [cell2mat(err4) t4];
+    
+    tic; [SRI_hat5,~] = stereo_blind(HSI, MSI, Pm, 3); t5 = toc;
+    err5 = compute_metrics(X,SRI_hat5,4,4); err5 = [cell2mat(err5) t5];
+    
+    err1(3) = []; err2(3) = []; err3(3) = []; err4(3) = []; err5(3) = [];
+    T = [err1; err2; err3; err4; err5]; save(sprintf('table_B6S4B%sdB.txt',lvl(i)),'T','-ASCII')
+    
+    
+    
+%     figure(1)
+%         %for k=1:size(X,3)
+%     subplot(2,3,1); imagesc(SRI_hat1(:,:,44)); title('SCUBA (1,1)')
+%     subplot(2,3,2); imagesc(SRI_hat2(:,:,44)); title('SCUBA (6,6)')
+%     subplot(2,3,4); imagesc(SRI_hat3(:,:,44)); title('BSCOTT (1,1)')
+%     subplot(2,3,5); imagesc(SRI_hat4(:,:,44)); title('BSCOTT (6,6)')
+%     subplot(2,3,3); imagesc(X(:,:,44)); title('Groundtruth')
+%     subplot(2,3,6); imagesc(SRI_hat5(:,:,44)); title('Blind-STEREO F=3')
+%     %pause(0.4)
+%         %end
+    
+    
+    
+%     err1 = zeros(1,size(X,3)); err2 = err1; err3 = err1; err4 = err1;
+%     for k=1:size(X,3)
+%         err1(1,k) = norm(X(:,:,k)-SRI_hat1(:,:,k),'fro')/norm(X(:,:,k),'fro');
+%         err2(1,k) = norm(X(:,:,k)-SRI_hat2(:,:,k),'fro')/norm(X(:,:,k),'fro');
+%         err3(1,k) = norm(X(:,:,k)-SRI_hat3(:,:,k),'fro')/norm(X(:,:,k),'fro');
+%         err4(1,k) = norm(X(:,:,k)-SRI_hat4(:,:,k),'fro')/norm(X(:,:,k),'fro');
+%     end
+%     
+%     figure(i)
+%     subplot(1,2,1); plot(err1); hold on; plot(err3); xlabel('Spectral bands'); ylabel('RMSE'); title('(1,1) blocks'); legend('SCUBA','BSCOTT')
+%     subplot(1,2,2); plot(err2); hold on; plot(err4); xlabel('Spectral bands'); ylabel('RMSE'); title('(6,6) blocks'); legend('SCUBA','BSCOTT')
+%     savefig(gcf, sprintf('bandwise_error6M4B%sdB',lvl(i)))
+    
+
+end
+
 %% TEST FOR SVD - SEMI-REAL DATA
 
-%%%%%%%%%%%
-% LOAD INDIAN PINES DATASET % 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%
+% %LOAD INDIAN PINES DATASET % 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 % SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
 % SRI(1,:,:) = []; SRI(:,1,:) = [];
@@ -582,9 +692,9 @@ legend('STEREO','SCOTT')
 % [P1,P2] = spatial_deg(SRI, q, d1, d2);
 % HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
-%%%%%%%%%%%
-% LOAD SALINAS DATASET % 
-%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%
+% % LOAD SALINAS DATASET % 
+% %%%%%%%%%%%%%%%%%%%%%%%%
 % SRI = cell2mat(struct2cell(load('Salinas.mat')));
 % SRI = crop(SRI,[80,84,size(SRI,3)]);
 % SRI(:,:,[108:112 154:167 224]) = []; %Regions of water absorption (Salinas)
@@ -594,9 +704,9 @@ legend('STEREO','SCOTT')
 % [P1,P2] = spatial_deg(SRI, q, d1, d2);
 % HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
-%%%%%%%%%%%
-% LOAD PAVIA DATASET % 
-%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%
+% % LOAD PAVIA DATASET % 
+% %%%%%%%%%%%%%%%%%%%%%%
 % SRI = cell2mat(struct2cell(load('PaviaU.mat')));
 % Pm = spectral_deg(SRI,"Quickbird");
 % MSI = tmprod(SRI,Pm,3);
@@ -614,16 +724,23 @@ d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
+% for k=1:size(MSI,3)
+%     MSI(:,:,k) = awgn(MSI(:,:,k),20);
+% end
+% for k=1:size(HSI,3)
+%     HSI(:,:,k) = awgn(HSI(:,:,k),20);
+% end
+
 figure
 subplot(1,3,1)
-x = log(svd(tens2mat(MSI,1,[])));
-plot(x)
+x = svd(tens2mat(MSI,1,[]));
+semilogy(x)
 subplot(1,3,2)
-x = log(svd(tens2mat(MSI,2,[])));
-plot(x)
+x = svd(tens2mat(MSI,2,[]));
+semilogy(x)
 subplot(1,3,3)
-x = log(svd(tens2mat(HSI,3,[])));
-plot(x)
+x = svd(tens2mat(HSI,3,[]));
+semilogy(x)
 
 %% TEST ON CURVATURE
 
@@ -647,4 +764,5 @@ surf(X,Y,cost2,H,'facecolor','interp');
 set(gca,'clim',[-1,1])
 figure
 surf(X,Y,snr_scott)
+
 
