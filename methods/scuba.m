@@ -1,5 +1,4 @@
 function [SRI_hat,info] = scuba(MSI,HSI,Pm, ranks, opts)
-
 % SCUBA runs the SCUBA algorithm for specified rank R
 % [SRI_hat,info] = SCUBA(MSI,HSI,ranks,Pm, opts) returns 
 % estimation of SRI and informative structure
@@ -27,63 +26,31 @@ if ~isfield(opts,'Nblocks') || isempty(opts.Nblocks)
 end
 
 options.MaxIter = 25;
-step_MSI = size(MSI); step_HSI = size(HSI);
-step_MSI = step_MSI(1:2) ./ opts.Nblocks; step_HSI = step_HSI(1:2) ./ opts.Nblocks;
-step_MSI = floor(step_MSI); step_HSI = floor(step_HSI);
+range_MSI = [size(MSI,1),size(MSI,2)]; 
+range_HSI = [size(HSI,1),size(HSI,2)];
+step_MSI = ceil(range_MSI ./ opts.Nblocks); 
+step_HSI = ceil(range_HSI ./ opts.Nblocks);
 SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
-for i1=1:opts.Nblocks(1)-1
-  for i2=1:opts.Nblocks(2)-1
-      U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), F, options); % hosvd
-      A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));    
-    [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
-                                (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R);
+for i1=1:opts.Nblocks(1)
+  for i2=1:opts.Nblocks(2)
+    M_ind_min = [i1-1,i2-1].*step_MSI + 1;
+    M_ind_max = min([i1,i2].*step_MSI, range_MSI);
+    H_ind_min = [i1-1,i2-1].*step_HSI + 1;
+    H_ind_max = min([i1,i2].*step_HSI, range_HSI);
+    
+    U = cpd(MSI(M_ind_min(1):M_ind_max(1), M_ind_min(2):M_ind_max(2), :), ...
+            F, options); % hosvd
+    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));    
+    [W_H, ~, ~] = svds(tens2mat(HSI(H_ind_min(1):H_ind_max(1), ...
+                                    H_ind_min(2):H_ind_max(2), :),3,[]), R);
     T = (Pm * W_H) \ C_tilde;
 
     C = W_H * T;
-    SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-            (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = cpdgen({A,B,C}); 
+    SRI_hat(M_ind_min(1):M_ind_max(1), M_ind_min(2):M_ind_max(2), :) = ...
+            cpdgen({A,B,C}); 
   end
 end
-
-for i2 = 1:opts.Nblocks(2)-1
-    U = cpd(MSI(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), R); % hosvd
-    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));   
-    [W_H, ~, ~] = svds(tens2mat(HSI(1+(opts.Nblocks(1)-1)*step_HSI(1):size(HSI,1), ...
-                                (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R);
-    T = (Pm * W_H) \ C_tilde;
-
-    C = W_H * T;
-    SRI_hat(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-            (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = cpdgen({A,B,C}); 
-end
-
-for i1 = 1:opts.Nblocks(1)-1
-    U = cpd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-                         1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :), R); % hosvd
-    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));       
-    [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
-                                1+(opts.Nblocks(2)-1)*step_HSI(2):size(HSI,2), :),3,[]), R);
-    T = (Pm * W_H) \ C_tilde;
-
-    C = W_H * T;
-    SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-            1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :) = cpdgen({A,B,C}); 
-end
-
-
-    U = cpd(MSI(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-                         1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :), R); % hosvd
-    A = cell2mat(U(1)); B = cell2mat(U(2)); C_tilde = cell2mat(U(3));   
-    [W_H, ~, ~] = svds(tens2mat(HSI(1+(opts.Nblocks(1)-1)*step_HSI(1):size(HSI,1), ...
-                                1+(opts.Nblocks(2)-1)*step_HSI(2):size(HSI,2), :),3,[]), R);
-    T = (Pm * W_H) \ C_tilde;
-
-    C = W_H * T;
-    SRI_hat(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-           1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :) = cpdgen({A,B,C});
 
 info.steps = {step_MSI,step_HSI};
 info.factors = {A,B,C};
