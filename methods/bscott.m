@@ -20,7 +20,7 @@ function [SRI_hat,info] = bscott(MSI,HSI,Pm,R,opts)
 if ~exist('opts','var')
     opts = struct();
 end
-if ~isfield(opts,'opts.Nblocks') || isempty(opts.Nblocks)
+if ~isfield(opts,'Nblocks') || isempty(opts.Nblocks)
     opts.Nblocks = [1,1];
 end
 
