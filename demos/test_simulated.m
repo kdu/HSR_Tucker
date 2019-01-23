@@ -380,9 +380,9 @@ for i=1:length(param)
 %                 [SRI_hat3,~] = bscott(MSI, HSI, Pm,R,opts2);
 %                 snr_bscott(r1,r3) = r_snr(X,SRI_hat2);
 %                 snr_bscott2(r1,r3) = r_snr(X,SRI_hat3);
-%                 if not((r3<=size(MSI,3) || r1<=size(HSI,1)) && (r1<=min(r3,size(MSI,3))*r1 && r3<=min(r1,size(HSI,1))^2))
-%                     snr_bscott(r1,r3) = NaN; snr_bscott2(r1,r3) = NaN;
-%                 end  
+                if not((r3<=size(MSI,3) || r1<=size(HSI,1)) && (r1<=min(r3,size(MSI,3))*r1 && r3<=min(r1,size(HSI,1))^2))
+                    snr_bscott(r1,r3) = NaN; snr_bscott2(r1,r3) = NaN;
+                end  
 %             end
 %         end
 %         

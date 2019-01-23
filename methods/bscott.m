@@ -24,63 +24,32 @@ if ~isfield(opts,'Nblocks') || isempty(opts.Nblocks)
     opts.Nblocks = [1,1];
 end
 
-step_MSI = size(MSI); step_HSI = size(HSI);
-step_MSI = step_MSI(1:2) ./ opts.Nblocks; step_HSI = step_HSI(1:2) ./ opts.Nblocks;
-step_MSI = floor(step_MSI); step_HSI = floor(step_HSI);
+range_MSI = [size(MSI,1),size(MSI,2)]; 
+range_HSI = [size(HSI,1),size(HSI,2)];
+step_MSI = ceil(range_MSI ./ opts.Nblocks); 
+step_HSI = ceil(range_HSI ./ opts.Nblocks);
 SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
-for i1=1:opts.Nblocks(1)-1
-  for i2=1:opts.Nblocks(2)-1
-      [fact,S] = mlsvd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), R); % hosvd
-      U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
-    [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
-                                (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R(3));
+for i1=1:opts.Nblocks(1)
+  for i2=1:opts.Nblocks(2)
+      
+    M_ind_min = [i1-1,i2-1].*step_MSI + 1;
+    M_ind_max = min([i1,i2].*step_MSI, range_MSI);
+    H_ind_min = [i1-1,i2-1].*step_HSI + 1;
+    H_ind_max = min([i1,i2].*step_HSI, range_HSI);
+    
+    [fact,S] = mlsvd(MSI(M_ind_min(1):M_ind_max(1),...
+                        M_ind_min(2):M_ind_max(2), :), R); % hosvd
+     U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
+    [W_H, ~, ~] = svds(tens2mat(HSI(H_ind_min(1):H_ind_max(1), ...
+                                H_ind_min(2):H_ind_max(2), :),3,[]), R(3));
     T = (Pm * W_H) \ W_tilde;
 
     W = W_H * T;
-    SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-            (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = lmlragen({U,V,W},S); 
+    SRI_hat(M_ind_min(1):M_ind_max(1),...
+            M_ind_min(2):M_ind_max(2), :) = lmlragen({U,V,W},S); 
   end
 end
-
-for i2 = 1:opts.Nblocks(2)-1
-    [fact,S] = mlsvd(MSI(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-                         (1:step_MSI(2)) + (i2-1)*step_MSI(2), :), R); % hosvd
-    U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
-    [W_H, ~, ~] = svds(tens2mat(HSI(1+(opts.Nblocks(1)-1)*step_HSI(1):size(HSI,1), ...
-                                (1:step_HSI(2)) + (i2-1)*step_HSI(2), :),3,[]), R(3));
-    T = (Pm * W_H) \ W_tilde;
-
-    W = W_H * T;
-    SRI_hat(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-            (1:step_MSI(2)) + (i2-1)*step_MSI(2), :) = lmlragen({U,V,W},S); 
-end
-
-for i1 = 1:opts.Nblocks(1)-1
-    [fact,S] = mlsvd(MSI((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-                         1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :), R); % hosvd
-    U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
-    [W_H, ~, ~] = svds(tens2mat(HSI((1:step_HSI(1)) + (i1-1)*step_HSI(1), ...
-                                1+(opts.Nblocks(2)-1)*step_HSI(2):size(HSI,2), :),3,[]), R(3));
-    T = (Pm * W_H) \ W_tilde;
-
-    W = W_H * T;
-    SRI_hat((1:step_MSI(1)) + (i1-1)*step_MSI(1), ...
-            1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :) = lmlragen({U,V,W},S); 
-end
-
-
-    [fact,S] = mlsvd(MSI(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-                         1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :), R); % hosvd
-    U = cell2mat(fact(1)); V = cell2mat(fact(2)); W_tilde = cell2mat(fact(3));    
-    [W_H, ~, ~] = svds(tens2mat(HSI(1+(opts.Nblocks(1)-1)*step_HSI(1):size(HSI,1), ...
-                                1+(opts.Nblocks(2)-1)*step_HSI(2):size(HSI,2), :),3,[]), R(3));
-    T = (Pm * W_H) \ W_tilde;
-
-    W = W_H * T;
-    SRI_hat(1+(opts.Nblocks(1)-1)*step_MSI(1):size(MSI,1), ...
-           1+(opts.Nblocks(2)-1)*step_MSI(2):size(MSI,2), :) = lmlragen({U,V,W},S); 
 
 info.factors = {U,V,W};
 info.core = {S};
