@@ -22,7 +22,6 @@ lambda = 1;
 R1 = 10:50; R3 = 2:25;
 for i=1:length(R1)
     for j=1:length(R3)
-        R = [R1(i), R1(i), R3(j)];
         filename = sprintf('data_exp1_%d_%d_%d_IP',R1(i),R1(i),R3(j));
         if not((j<=size(MSI,3) || i<=size(HSI,1)) && (i<=min(j,size(MSI,3))*i && j<=min(i,size(HSI,1))^2))
             snr = NaN; cost = NaN;

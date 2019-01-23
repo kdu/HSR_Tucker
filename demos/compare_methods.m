@@ -1,5 +1,6 @@
-function [res] = compare_methods(SRI, HSI, MSI, DegMat, ds, methods)
+function [res, est] = compare_methods(SRI, HSI, MSI, DegMat, ds, methods)
   res = cell(size(methods,1), 6);
+  est = cell(size(methods,1),1);
   for i=1:size(methods,1)
     % Initialize parameters and find name
     opt = struct();
@@ -18,6 +19,7 @@ function [res] = compare_methods(SRI, HSI, MSI, DegMat, ds, methods)
              methods{i,2}, ParamStr,  methods{i,3}));
     time = toc;
     res(i,:) = [methname, compute_metrics(SRI,Y_hat,ds(1),ds(2)), time];
+    est{i} = Y_hat;
   end       
 end
 

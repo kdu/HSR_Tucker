@@ -8,14 +8,13 @@ addpath ../metrics
 
 
 %% Indian Pines (removed regions of water absorption):
-% 1. load data
-SRI = cell2mat(struct2cell(load('Indian_pines_corrected.mat')));
-SRI = SRI(2:end,2:end,:);  % crop image to 144x144
-% 2. spectral degradation
+SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
+SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
+SRI(1,:,:) = []; SRI(:,1,:) = [];
 Pm = spectral_deg(SRI,"LANDSAT");
-d1 = 4; d2 = 4;
-[P1,P2] = spatial_deg(SRI, 9, d1, d2);
 MSI = tmprod(SRI,Pm,3);
+d1 = 4; d2 = 4; q = 9;
+[P1,P2] = spatial_deg(SRI, q, d1, d2);
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
 % 3. run metrics
