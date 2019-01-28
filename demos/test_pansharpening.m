@@ -19,9 +19,10 @@ MSI = tmprod(SRI,Pm,3);
 
 %% Make table
 
-methods = {'SCOTT' 'scott' '[24,24,25]';...
-           'SCOTT' 'scott' '[30,30,16]';...
-           'SCOTT' 'scott' '[35,35,6]';};      
+methods = {'SCOTT' 'scott' '[24,24,25]' [];...
+           'SCOTT' 'scott' '[30,30,16]' [];...
+           'SCOTT' 'scott' '[35,35,6]' [];
+           'HySure','hysure_b1_adaptor','[]',16};      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
 res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
 T = cell2mat(res(:,2:end)); save('exp4_table2_ip.txt','T','-ASCII')

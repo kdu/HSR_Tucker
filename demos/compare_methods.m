@@ -2,7 +2,7 @@ function [res, est] = compare_methods(SRI, HSI, MSI, DegMat, ds, methods)
   res = cell(size(methods,1), 6);
   est = cell(size(methods,1),1);
   for i=1:size(methods,1)
-      methods{i,1}
+    
     % Initialize parameters and find name
     opt = struct();
     blockstr = '';

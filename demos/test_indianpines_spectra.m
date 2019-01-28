@@ -49,7 +49,10 @@ for i=1:length(mat)
     s4 = real(mean(Xhat4(:,ind),2));
     
     subplot(2,2,i)
-    plot((s-s1)./s);hold on;plot((s-s2)./s);hold on;plot((s-s3)./s);hold on;plot((s-s4)./s)
+    plot((s-s1)./s,'Linewidth',1);hold on;
+    plot((s-s2)./s,'Linewidth',1);hold on;
+    plot((s-s3)./s,'Linewidth',1);hold on;
+    plot((s-s4)./s,'Linewidth',1)
      title(sprintf('Material %d',mat(i)))
     legend(sprintf('%s,%s',methods{1,1},methods{1,3}),...
         sprintf('%s,%s',methods{2,1},methods{2,3}),...
@@ -78,8 +81,11 @@ for i=1:length(mat)
     s4 = real(mean(Xhat4(:,ind),2));
     
     subplot(2,2,i)
-    plot(s(80:100));hold on; plot(s1(80:100));hold on; plot(s2(80:100));...
-        hold on; plot(s3(80:100)); hold on;  plot(s4(80:100))
+    plot(s(80:100),'Linewidth',1);hold on;
+    plot(s1(80:100),'Linewidth',1);hold on;
+    plot(s2(80:100),'Linewidth',1);hold on;
+    plot(s3(80:100),'Linewidth',1); hold on;
+    plot(s4(80:100),'Linewidth',1)
      title(sprintf('Material %d',mat(i)))
     legend('Original spectrum',...
         sprintf('%s,%s',methods{1,1},methods{1,3}),...
