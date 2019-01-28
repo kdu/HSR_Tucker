@@ -34,6 +34,7 @@ SRI_hat = zeros(size(MSI,1), size(MSI,2), size(HSI,3));
 
 for i1=1:opts.Nblocks(1)
   for i2=1:opts.Nblocks(2)
+    
     M_ind_min = [i1-1,i2-1].*step_MSI + 1;
     M_ind_max = min([i1,i2].*step_MSI, range_MSI);
     H_ind_min = [i1-1,i2-1].*step_HSI + 1;
