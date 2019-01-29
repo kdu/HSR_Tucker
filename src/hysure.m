@@ -7,7 +7,7 @@ hsize_h = 10; hsize_w = 10;
 shift = 1; blur_center = 0; lambda_R = 1e1; lambda_B = 1e1;
 basis_type = 'VCA'; lambda_phi = 5e-4; lambda_m = 1e0;
 
-d1 = size(MSI,1)/size(HSI,1)
+d1 = size(MSI,1)/size(HSI,1);
 
 if size(MSI,3)==4
     Km = 4;
@@ -40,11 +40,9 @@ elseif size(MSI,3)==1
     contiguous = intersection;
 end
 
-intersection
-
 [V, R_est, B_est] = sen_resp_est(HSI, MSI, d1, intersection, contiguous, opt.p, lambda_R, lambda_B, hsize_h, hsize_w, shift, blur_center);
 tic; SRI_hat = data_fusion(HSI, MSI, d1, R_est, B_est, opt.p, basis_type, lambda_phi, lambda_m); t = toc;
-%Zhat = im2mat(Zimhat); Zhat_denoised = (V*V')*Zhat; SRI_hat = mat2im(Zhat_denoised, size(HSI,1));
+Zhat = im2mat(SRI_hat); Zhat_denoised = (V*V')*Zhat; SRI_hat = mat2im(Zhat_denoised, size(MSI,1));
 
 info.time = t;
 
