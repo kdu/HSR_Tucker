@@ -7,7 +7,7 @@ hsize_h = 10; hsize_w = 10;
 shift = 1; blur_center = 0; lambda_R = 1e1; lambda_B = 1e1;
 basis_type = 'VCA'; lambda_phi = 5e-4; lambda_m = 1e0;
 
-d1 = size(MSI,1)/size(HSI,1);
+d1 = ceil(size(MSI,1)/size(HSI,1));
 
 if size(MSI,3)==4
     Km = 4;

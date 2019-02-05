@@ -32,7 +32,7 @@ res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods);
 
 %% Salinas-A scene
 % 1. load data
-SRI = cell2mat(struct2cell(load('Salinas.mat')));
+SRI = cell2mat(struct2cell(load('SalinasA.mat')));
 SRI = crop(SRI,[80,84,size(SRI,3)]);
 SRI(:,:,[108:112 154:167 224]) = []; %Regions of water absorption (Salinas)
 % 2. degradation

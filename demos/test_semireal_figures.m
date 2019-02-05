@@ -1,9 +1,9 @@
-% TABLES FOR SEMIREAL DATA %
+% VISUAL FOR SEMIREAL DATA %
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
 
-%% Table for Indian Pines
+%% Simulations for Indian Pines
 
 SRI = cell2mat(struct2cell(load('Indian_pines.mat')));
 SRI(:,:,[104:108 150:163 220]) = []; %Regions of water absorption
@@ -14,22 +14,13 @@ d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
-% 3. run metrics
 methods = {'STEREO' 'stereo3' '50' []; ...
-           'STEREO' 'stereo3' '100' []; ...
            'SCOTT' 'scott' '[40,40,6]' []; ...
-           'SCOTT' 'scott' '[30,30,16]' []; ...
-           'SCOTT' 'scott' '[24,24,25]' [];...
-           'B-SCOTT' 'bscott_b1_adaptor' '[40,40,6]' []; ...                 
-           'B-SCOTT' 'bscott_b1_adaptor' '[60,60,6]' []; ...                 
-           'B-SCOTT' 'bscott_b1_adaptor' '[100,100,6]' [];...
-           'HySure' 'hysure_b1_adaptor' '[]' 16;};     
+           'HySure','hysure_b1_adaptor','[]',16};      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
-res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods);  
-T = cell2mat(res(:,2:end)); save('exp3_table2.txt','T','-ASCII')
+[res, est] = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
 
-
-%% Table for Salinas A-scene
+%% Simulations for Salinas A-scene
 
 % 1. load data
 SRI = cell2mat(struct2cell(load('SalinasA.mat')));
@@ -41,15 +32,16 @@ d1 = 4; d2 = 4; q = 9;
 [P1,P2] = spatial_deg(SRI, q, d1, d2);
 MSI = tmprod(SRI,Pm,3); HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
-% 3. run metrics
-methods = {'STEREO' 'stereo3' '50' []; ...
-           'STEREO' 'stereo3' '100' []; ...
-           'SCOTT' 'scott' '[40,40,6]' []; ...
-           'SCOTT' 'scott' '[14,14,15]' []; ...
-           'SCOTT' 'scott' '[10,15,25]' [];...
-           'SCOTT' 'scott' '[30,30,6]' [];...                
+methods = {'STEREO' 'stereo3' '100' []; ...         
            'SCOTT' 'scott' '[58,58,6]' [];...
            'HySure','hysure_b1_adaptor','[]',6};      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
-res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
-T = cell2mat(res(:,2:end)); save('exp3_table2_sal.txt','T','-ASCII')
+[~,est] = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
+
+%% Make figure
+
+figure
+subplot(2,2,1); imagesc(SRI(:,:,160)); title('Groundtruth SRI'); colorbar; lim = caxis; axis off
+subplot(2,2,2); imagesc(real(est{1}(:,:,160))); title(sprintf('%s, F=%s',methods{1,1},methods{1,3})); colorbar; caxis(lim); axis off
+subplot(2,2,3); imagesc(real(est{2}(:,:,160))); title(sprintf('%s, R=%s',methods{2,1},methods{2,3})); colorbar; caxis(lim); axis off
+subplot(2,2,4); imagesc(real(est{3}(:,:,160))); title(sprintf('%s, p=%d',methods{3,1},methods{3,4})); colorbar; caxis(lim); axis off

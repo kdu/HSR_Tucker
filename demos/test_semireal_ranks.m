@@ -22,8 +22,9 @@ lambda = 1;
 R1 = 10:50; R3 = 2:25;
 for i=1:length(R1)
     for j=1:length(R3)
+        R = [R1(i),R1(i),R3(j)];
         filename = sprintf('data_exp1_%d_%d_%d_IP',R1(i),R1(i),R3(j));
-        if not((j<=size(MSI,3) || i<=size(HSI,1)) && (i<=min(j,size(MSI,3))*i && j<=min(i,size(HSI,1))^2))
+        if not((R3(j)<=size(MSI,3) || R1(i)<=size(HSI,1)) && (R1(i)<=min(R3(j),size(MSI,3))*R1(i) && R3(j)<=min(R1(i),size(HSI,1))^2))
             snr = NaN; cost = NaN;
         else  
             [SRI_hat,info] = scott(HSI, MSI, P1, P2, Pm, R);
@@ -74,21 +75,21 @@ snr1 = []; cost1 = [];
 for i=10:50
     for j=2:25
         eval(sprintf('load(''data_exp1_%d_%d_%d_IP'')',i,i,j));
-        snr1(i-1,j-1) = snr; cost1(i-1,j-1) = cost;
+        snr1(i-9,j-1) = snr; cost1(i-9,j-1) = cost;
     end
 end
 
 R3 = 2:25; R1 = 10:50;
 figure(1)
-surfc(R3,R1,snr1)
+surfc(R3,R1,snr1,'FaceColor','interp')
 ylabel('R1=R2'); xlabel('R3'); zlabel('SNR(dB)');
-title('SNR between SRI and estimate for R1=R2 and R3')
-saveas(gcf,'fig_exp1_snr_R2f_IP','fig')
+title('SNR between SRI and estimate for R1=R2 and R3'); 
+%saveas(gcf,'fig_exp1_snr_R2f_IP','fig')
 figure(2)
 surfc(R3,R1,cost1)
 ylabel('R1=R2'); xlabel('R3'); zlabel('Value of cost function');
 title('Cost function value between SRI and estimate for R1=R2 and R3')
-saveas(gcf,'fig_exp1_cost_R2f_IP','fig')
+%saveas(gcf,'fig_exp1_cost_R2f_IP','fig')
 
 %% Figure, R3 = 6
 
