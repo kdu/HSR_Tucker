@@ -81,14 +81,14 @@ end
 
 R3 = 2:25; R1 = 10:50;
 figure(1)
-surfc(R3,R1,snr1,'FaceColor','interp')
+surf(R3,R1,snr1,'FaceColor','interp')
 ylabel('R1=R2'); xlabel('R3'); zlabel('SNR(dB)');
-title('SNR between SRI and estimate for R1=R2 and R3'); 
+title('SNR between SRI and estimate for R1=R2 and R3'); colormap
 %saveas(gcf,'fig_exp1_snr_R2f_IP','fig')
 figure(2)
-surfc(R3,R1,cost1)
+surf(R3,R1,cost1)
 ylabel('R1=R2'); xlabel('R3'); zlabel('Value of cost function');
-title('Cost function value between SRI and estimate for R1=R2 and R3')
+title('Cost function value between SRI and estimate for R1=R2 and R3'); colormap
 %saveas(gcf,'fig_exp1_cost_R2f_IP','fig')
 
 %% Figure, R3 = 6
