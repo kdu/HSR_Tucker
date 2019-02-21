@@ -2,9 +2,10 @@ function [SRI_hat,info] = hysure(HSI,MSI, opt)
 %UNTITLED23 Summary of this function goes here
 %   Detailed explanation goes here
 
-
+% hsize_h = 10; hsize_w = 10;
+% shift = 1;
 hsize_h = 10; hsize_w = 10;
-shift = 1; blur_center = 0; lambda_R = 1e1; lambda_B = 1e1;
+shift = 3; blur_center = 4; lambda_R = 1e1; lambda_B = 1e1;
 basis_type = 'VCA'; lambda_phi = 5e-4; lambda_m = 1e0;
 
 d1 = ceil(size(MSI,1)/size(HSI,1));
@@ -40,10 +41,23 @@ elseif size(MSI,3)==1
     contiguous = intersection;
 end
 
-[V, R_est, B_est] = sen_resp_est(HSI, MSI, d1, intersection, contiguous, opt.p, lambda_R, lambda_B, hsize_h, hsize_w, shift, blur_center);
-tic; SRI_hat = data_fusion(HSI, MSI, d1, R_est, B_est, opt.p, basis_type, lambda_phi, lambda_m); t = toc;
-Zhat = im2mat(SRI_hat); Zhat_denoised = (V*V')*Zhat; SRI_hat = mat2im(Zhat_denoised, size(MSI,1));
+%[V, R_est, B_est] = sen_resp_est(HSI, MSI, d1, intersection, contiguous, opt.p, lambda_R, lambda_B, hsize_h, hsize_w, shift, blur_center);
+%tic; SRI_hat = data_fusion(HSI, MSI, d1, R_est, B_est, opt.p, basis_type, lambda_phi, lambda_m); t = toc;
 
+Pm = zeros(1,size(HSI,3));
+spec_range = linspace(400,2500,size(HSI,3));
+Pm(1,:) = 1/length(spec_range);
+R_est = Pm;
+B_est = zeros(size(MSI,1),size(MSI,2));
+h1 = gauss_kernel(9, 1);
+B_est(1:9,1:9) = h1' * h1;
+
+%B_est = circshift(circshift(B_est,-4,2),-4,1);
+
+tic; SRI_hat = data_fusion(HSI, MSI, d1, R_est, B_est, opt.p, basis_type, lambda_phi, lambda_m); t = toc;
+%Zhat = im2mat(SRI_hat); Zhat_denoised = (V*V')*Zhat; SRI_hat = mat2im(Zhat_denoised, size(MSI,1));
+
+Zhat = im2mat(SRI_hat); Zhat_denoised = Zhat; SRI_hat = mat2im(Zhat_denoised, size(MSI,1));
 info.time = t;
 
 end

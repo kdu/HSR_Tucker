@@ -41,7 +41,7 @@ DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);
 %% Make figure
 
 figure
-subplot(2,2,1); imagesc(SRI(:,:,160)); title('Groundtruth SRI'); colorbar; lim = caxis; axis off
-subplot(2,2,2); imagesc(real(est{1}(:,:,160))); title(sprintf('%s, F=%s',methods{1,1},methods{1,3})); colorbar; caxis(lim); axis off
-subplot(2,2,3); imagesc(real(est{2}(:,:,160))); title(sprintf('%s, R=%s',methods{2,1},methods{2,3})); colorbar; caxis(lim); axis off
-subplot(2,2,4); imagesc(real(est{3}(:,:,160))); title(sprintf('%s, p=%d',methods{3,1},methods{3,4})); colorbar; caxis(lim); axis off
+subplot(2,2,1); imagesc(SRI(:,:,44)); title('Groundtruth SRI'); colorbar; lim = caxis; axis off
+subplot(2,2,2); imagesc(real(est{1}(:,:,44))); title(sprintf('%s, F=%s',methods{1,1},methods{1,3})); colorbar; caxis(lim); axis off
+subplot(2,2,3); imagesc(real(est{2}(:,:,44))); title(sprintf('%s, R=%s',methods{2,1},methods{2,3})); colorbar; caxis(lim); axis off
+subplot(2,2,4); imagesc(real(est{3}(:,:,44))); title(sprintf('%s, p=%d',methods{3,1},methods{3,4})); colorbar; caxis(lim); axis off
