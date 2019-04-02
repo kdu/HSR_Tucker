@@ -15,10 +15,10 @@ d1 = 4; d2 = 4; q = 9;
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
 methods = {'STEREO' 'stereo3' '50' []; ...
-           'SCOTT' 'scott' '[40,40,6]' []; ...
+           'SCOTT' 'scott2' '[40,40,6]' []; ...
            'HySure','hysure_b1_adaptor','[]',16};      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
-[res, est] = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
+[~, est] = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
 
 %% Simulations for Salinas A-scene
 
@@ -33,15 +33,15 @@ d1 = 4; d2 = 4; q = 9;
 MSI = tmprod(SRI,Pm,3); HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
 methods = {'STEREO' 'stereo3' '100' []; ...         
-           'SCOTT' 'scott' '[58,58,6]' [];...
+           'SCOTT' 'scott2' '[70,70,6]' [];...
            'HySure','hysure_b1_adaptor','[]',6};      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
-[~,est] = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
+[res,est] = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
 
 %% Make figure
 
 figure
-subplot(2,2,1); imagesc(SRI(:,:,44)); title('Groundtruth SRI'); colorbar; lim = caxis; axis off
-subplot(2,2,2); imagesc(real(est{1}(:,:,44))); title(sprintf('%s, F=%s',methods{1,1},methods{1,3})); colorbar; caxis(lim); axis off
-subplot(2,2,3); imagesc(real(est{2}(:,:,44))); title(sprintf('%s, R=%s',methods{2,1},methods{2,3})); colorbar; caxis(lim); axis off
-subplot(2,2,4); imagesc(real(est{3}(:,:,44))); title(sprintf('%s, p=%d',methods{3,1},methods{3,4})); colorbar; caxis(lim); axis off
+subplot(2,2,1); imagesc(SRI(:,:,120)); title('Groundtruth SRI'); colorbar; lim = caxis; axis off
+subplot(2,2,2); imagesc(real(est{1}(:,:,120))); title(sprintf('%s, F=%s',methods{1,1},methods{1,3})); colorbar; caxis(lim); axis off
+subplot(2,2,3); imagesc(real(est{2}(:,:,120))); title(sprintf('%s, R=%s',methods{2,1},methods{2,3})); colorbar; caxis(lim); axis off
+subplot(2,2,4); imagesc(real(est{3}(:,:,120))); title(sprintf('%s, p=%d',methods{3,1},methods{3,4})); colorbar; caxis(lim); axis off

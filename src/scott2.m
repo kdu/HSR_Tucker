@@ -31,28 +31,27 @@ end
 [V, ~, ~] = svds(tens2mat(MSI,2,[]),R(2));
 [W, ~, ~] = svds(tens2mat(HSI,3,[]), R(3));
 
-%%%%%%%%%%%%%%%%%%%
-% ALWAYS WORKS BUT SLOWER  %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% A = kron(eye(R(3)),kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U)) + lam * kron(W'*(Pm'*Pm)*W, eye(R(1)*R(2)));
-% b = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + lam * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
-% S = reshape(A\ b(:),R);
-
-%%%%%%%%%%%%%%%%%%
-% ONLY WORKS UNDER IDENTIFIABILITY CONDITIONS %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-A = kron(U'*(P1'*P1)*U);
-B = kron(eye(R(3)), V'*(P2'*P2)*V);
-C = eye(R(1));
-D = kron(opts.lambda* W'*(Pm'*Pm)*W, eye(R(2)));
-b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
-E = reshape(b_old, R(1),R(2)*R(3));
-if R(3) > size(MSI, 3)
-  S = reshape(bartelsStewart(A,B,C,D,E),R);
-else
- S = reshape(bartelsStewart(C,D,A,B,E),R);
-end  
+if R(1)>size(HSI,1)
+    A = kron(U'*(P1'*P1)*U);
+    B = kron(eye(R(3)), V'*(P2'*P2)*V);
+    C = eye(R(1));
+    D = kron(opts.lambda* W'*(Pm'*Pm)*W, eye(R(2)));
+    b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+    E = reshape(b_old, R(1),R(2)*R(3));
+    if R(3) > size(MSI, 3)
+      S = reshape(bartelsStewart(A,B,C,D,E),R);
+    else
+     S = reshape(bartelsStewart(C,D,A,B,E),R);
+    end 
+elseif R(1)<=size(HSI,1)
+    A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
+    A = A+ opts.alpha*norm(A,2)^2*ones(size(A,2));
+    B = opts.lambda* W'*(Pm'*Pm)*W;
+    B = B+ opts.alpha*norm(A,2)^2*ones(size(B,2));
+    b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+    C = reshape(b_old, R(1)*R(2), R(3));
+    S = reshape(bartelsStewart(A,[],[],B,C), R);
+end
 
 SRI_hat = lmlragen({U,V,W},S);
 info.factors = {U,V,W};

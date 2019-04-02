@@ -15,12 +15,12 @@ function Phi = gauss_kernel(q,sigma)
 % Contact: clemence.prevost@univ-lorraine.fr
 
 if nargin==1
-    sigma = 0.5;
+    sigma = 1;
 end
 
 Phi = zeros(1,q);
 for m=1:q
-    Phi(m) = (1/sqrt(2*pi*sigma^2))*exp(-(m-ceil(q/2))^2 / 2);
+    Phi(m) = (1/sqrt(2*pi*sigma^2))*exp(-(m-ceil(q/2))^2 / (2*sigma^2));
 end
 
 end

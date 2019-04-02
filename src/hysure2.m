@@ -18,9 +18,9 @@ d1 = ceil(size(MSI,1)/size(HSI,1));
 % h1 = gauss_kernel(9, 1);
 % B_est(1:9,1:9) = h1' * h1;
 
-B_est = P1(1,:)'*P2(1,:);
+B_est = real(P1(1,:)'*P2(1,:));
 
-%B_est = circshift(circshift(B_est,-4,2),-4,1);
+B_est = circshift(circshift(B_est,-4,2),-4,1);
 
 tic; SRI_hat = data_fusion(HSI, MSI, d1, Pm, B_est, opt.p, basis_type, lambda_phi, lambda_m); t = toc;
 

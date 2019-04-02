@@ -88,21 +88,21 @@ figure
        subplot(1,3,1)
         x = log(svd(tens2mat(MSI,1,[])));
         ylim auto
-        plot(x(1:10),'-s','MarkerSize',3,'Linewidth',1.1)
+        plot(x(1:15),'-s','MarkerSize',3,'Linewidth',1.1)
         title('1st unfolding MSI')
         legend(leg(1:j),'Location', 'southoutside')
         hold on
        subplot(1,3,2)
         x = log(svd(tens2mat(MSI,2,[])));
         ylim auto
-        plot(x(1:10),'-s','MarkerSize',3,'Linewidth',1.1)
+        plot(x(1:15),'-s','MarkerSize',3,'Linewidth',1.1)
         title('2nd unfolding MSI')
         legend(leg(1:j),'Location', 'southoutside')
         hold on
        subplot(1,3,3)
         x = log(svd(tens2mat(HSI,3,[])));
         ylim auto
-        plot(x(1:10),'-s','MarkerSize',3,'Linewidth',1.1)
+        plot(x(1:15),'-s','MarkerSize',3,'Linewidth',1.1)
         title('3rd unfolding HSI')
         legend(leg(1:j),'Location', 'southoutside')
         hold on

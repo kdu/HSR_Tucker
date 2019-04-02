@@ -1,4 +1,4 @@
-% EXPERIMENT 1: R-SNR FOR NOISY SIMULATED SRI 6x6x4 %
+% EXPERIMENT 1: R-SNR FOR NOISELESS SIMULATED SRI 6x6x4 %
 % Copyright (c) 2018 Clemence Prevost, Konstantin Usevich, Pierre Comon, David Brie
 % https://github.com/cprevost4/HSR_Tucker
 % Contact: clemence.prevost@univ-lorraine.fr
@@ -50,17 +50,17 @@ d1 = 4; d2 = 4; q = 9;
 HSI_true = tmprod(tmprod(X,P1,1),P2,2); HSI=HSI_true;
 
 
-    for k=1:4
-        MSI(:,:,k) = awgn(MSI_true(:,:,k),35);
-    end
-    for k=1:size(HSI_true,3)
-        HSI(:,:,k) = awgn(HSI_true(:,:,k),35);
-    end
+%     for k=1:4
+%         MSI(:,:,k) = awgn(MSI_true(:,:,k),35);
+%     end
+%     for k=1:size(HSI_true,3)
+%         HSI(:,:,k) = awgn(HSI_true(:,:,k),35);
+%     end
 
 %% Run simulations
 
 snr_stereo = []; snr_scott = [];
- for F=1:70
+ for F=1:40%70
     F
     try
         [SRI_hat2, ~] = stereo3(HSI, MSI, P1,P2,Pm, F);
@@ -71,8 +71,8 @@ snr_stereo = []; snr_scott = [];
     end
  end
 
- for r1=1:size(HSI,1)+10
-    for r3=1:10
+ for r1=1:40%size(HSI,1)+10
+    for r3=1:15
         R = [r1,r1,r3]
 
         if ((r3<=size(MSI,3) || r1<=size(HSI,1)) && r3<=(min(r1,size(HSI,1)))^2)%identifiability
@@ -87,9 +87,9 @@ end
 %% Make figure
 
 figure
-subplot(1,2,1); plot(1:70,snr_stereo) ;xlabel('F'); ylabel('SNR (dB)');...
-    xlim([1 70]); title('STEREO')
-subplot(1,2,2); surf(1:10,1:size(HSI)+10,snr_scott); xlabel('R_3');...
+subplot(1,2,1); plot(1:40,snr_stereo) ;xlabel('F'); ylabel('SNR (dB)');...
+    xlim([1 40]); title('STEREO')
+subplot(1,2,2); surf(1:15,1:40,snr_scott); xlabel('R_3');...
     ylabel('R_1 = R_2'); title('SCOTT')
 
 %% 
@@ -99,20 +99,20 @@ subplot(1,2,2); surf(1:10,1:size(HSI)+10,snr_scott); xlabel('R_3');...
 % subplot(1,2,2); imagesc(X(:,:,160)); title('Spectral band 160')
 
 %% ADD CURVE TO THE STEREO PLOT
-
-r3=6;
- for r1=1:size(HSI,1)+10
-        R = [r1,r1,r3]
-        %try
-            [SRI_hat2,~] = scott2(HSI, MSI, P1, P2, Pm, R);
-            snr_scott(r1,r3) = r_snr(X,SRI_hat2);
-        %catch
-            %snr_scott(r1,r3) = NaN;
-            %continue
-        %end
-
-        if not((r3<=size(MSI,3) || r1<=size(HSI,1)) && r3<=(min(r1,size(HSI,1)))^2)%identifiability
-             snr_scott(r1,r3) = NaN;
-        end
- end
+% 
+% r3=6;
+%  for r1=1:size(HSI,1)+10
+%         R = [r1,r1,r3]
+%         %try
+%             [SRI_hat2,~] = scott2(HSI, MSI, P1, P2, Pm, R);
+%             snr_scott(r1,r3) = r_snr(X,SRI_hat2);
+%         %catch
+%             %snr_scott(r1,r3) = NaN;
+%             %continue
+%         %end
+% 
+%         if not((r3<=size(MSI,3) || r1<=size(HSI,1)) && r3<=(min(r1,size(HSI,1)))^2)%identifiability
+%              snr_scott(r1,r3) = NaN;
+%         end
+%  end
 

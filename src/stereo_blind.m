@@ -44,7 +44,7 @@ Yh1 = tens2mat(HSI,[],1); Yh2 = tens2mat(HSI,[],2); Yh3 = tens2mat(HSI,[],3);
 Ym1 = tens2mat(MSI,[],1); Ym2 = tens2mat(MSI,[],2); Ym3 = tens2mat(MSI,[],3);
 
 for n = 1:opts.Niter
-
+n
     %disp('C...')
     mat1 = kr(B,A); mat2 = kr(B_tilde,A_tilde);
     R = opts.lambda*Pm'*Ym3'*mat1 + Yh3'*mat2;
