@@ -16,6 +16,9 @@ if ~isfield(opts,'CPD_Niter') || isempty(opts.CPD_Niter)
 end
 if ~isfield(opts,'factors') || isempty(opts.factors)
     [A, B, ~,~, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks);
+    %[A,B,C,~,~,~]=TenRec(MSI,tens2mat(HSI,[],3),opts.CPD_Niter,ranks,P1,P2);
+else
+    A = opts.factors{1}; B = opts.factors{2}; C = opts.factors{3};
 end
 
 opts2.POSDEF = true; opts2.SYM = true;
