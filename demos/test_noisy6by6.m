@@ -87,9 +87,12 @@ end
 %% Make figure
 
 figure
-subplot(1,2,1); plot(1:70,snr_stereo) ;xlabel('F'); ylabel('SNR (dB)');...
-    xlim([1 70]); title('STEREO')
-subplot(1,2,2); surf(1:10,1:size(HSI)+10,snr_scott); xlabel('R_3');...
+plot(1:70,snr_stereo); hold on; plot(1:70, snr_scott(:,6))
+legend('STEREO','SCOTT')
+xlabel('F'); ylabel('SNR (dB)');...
+    xlim([1 70]); title('STEREO and SCOTT (R_3=N)')
+figure
+surf(1:10,1:size(HSI)+10,snr_scott); xlabel('R_3');...
     ylabel('R_1 = R_2'); title('SCOTT')
 
 %% 

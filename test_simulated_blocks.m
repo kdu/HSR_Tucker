@@ -78,10 +78,13 @@ snr_stereo = []; snr_scott = [];
  
  %% MAKE FIGURES
  
- figure
-subplot(1,2,1); plot(1:40,snr_stereo) ;xlabel('F'); ylabel('SNR (dB)');...
-    xlim([1 40]); title('STEREO')
-subplot(1,2,2); surf(1:15,1:size(HSI)+10,snr_scott); xlabel('R_3');...
+figure
+plot(1:40,snr_stereo); hold on; plot(1:40, snr_scott(:,6))
+legend('STEREO','SCOTT')
+xlabel('F'); ylabel('SNR (dB)');...
+    xlim([1 40]); title('STEREO and SCOTT (R_3=N)')
+figure
+surf(1:15,1:size(HSI)+10,snr_scott); xlabel('R_3');...
     ylabel('R_1 = R_2'); title('SCOTT')
 
 %% 
@@ -90,9 +93,6 @@ figure
 subplot(1,2,1); imagesc(SRI(:,:,44)); title('Spectral band 44')
 subplot(1,2,2); imagesc(SRI(:,:,160)); title('Spectral band 160')
 
-%% TRY OUT SOME SHIT
-
-X3 = tens2mat(SRI,3,[]);
 
 
 

@@ -1,5 +1,8 @@
-function [SRI_hat, err] = stereo3( HSI, MSI, P1,P2,Pm, ranks, opts)
+function [SRI_hat, err] = stereo4( HSI, MSI, P1,P2,Pm, ranks, opts)
 
+if ~exist('opts','var')
+    opts = struct();
+end
 if ~isfield(opts,'factors') || isempty(opts.factors)
     [A, B, ~,~, C] = stereo_init(MSI, HSI, P1, P2, Pm, ranks);
     %[A,B,C,~,~,~]=TenRec(MSI,tens2mat(HSI,[],3),opts.CPD_Niter,ranks,P1,P2);

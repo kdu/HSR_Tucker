@@ -79,14 +79,18 @@ cost(find(cost==0)) = 0.7e10;
 
 figure(1)
 pcolor(snr)
+shading 'interp'
 xlabel("R_3");ylabel("R_1 = R_2");
-rectangle('Position',[7 37 50 50],'FaceColor',[1,1,1])
+rectangle('Position',[6 36 50 50],'FaceColor',[1,1,1])
+grid on; set(gca,'layer','top')
 xlim([2 25]); ylim([10 50]);
 
 figure(2)
 pcolor(cost)
+shading 'interp'
 xlabel("R_3");ylabel("R_1 = R_2");
-rectangle('Position',[7 37 50 50],'FaceColor',[1,1,1])
+rectangle('Position',[6 36 50 50],'FaceColor',[1,1,1])
+grid on; set(gca,'layer','top')
 xlim([2 25]); ylim([10 50]);
 
 
