@@ -1,49 +1,29 @@
-%% README.txt -” A guide for the HSR package %%
+# HSR_Tucker: Hyperspectral Super-Resolution with Coupled Tucker Approximation
 
-Link to the datasets (Indian Pines and Salinas): http://www.ehu.eus/ccwintco/index.php/Hyperspectral_Remote_Sensing_Scenes
-Link to the TensorLab toolbox for MATLAB: https://www.tensorlab.net
-Link to the HySure package: https://github.com/alfaiate/HySure/tree/master/src
+This repository contains the implementation for the methods proposed in the preprint:
+```
+@unpublished{prevost:hal-01911969,
+ TITLE = {{Hyperspectral super-resolution with coupled Tucker approximation: Identifiability and SVD-based algorithms}},
+ AUTHOR = {Pr{\'e}vost, Cl{\'e}mence and Usevich, Konstantin and Comon, Pierre and Brie, David},
+ URL = {https://hal.archives-ouvertes.fr/hal-01911969},
+ YEAR = {2019},
+ HAL_ID = {hal-01911969},
+ HAL_VERSION = {v3},
+}
+```
+It also reproduces the results of the experiments from the preprint.
 
-../demos contains:
-	test_exp1.m: Plots figures of cost and SNR as a function of R1, R2, R3. You can choose to fix R2= R1 or R3. Data and figure saves automatically.
+## Installation 
+[TensorLab v.3.0](https://www.tensorlab.net) should be installed and should be on the MATLAB path.
 
-	test_exp2.m: Experiments on the reconstruction of spectral signature. You can plot all spectra, only portions, relative + normalized error. Uses data from text_exp1. Data and figure saves automatically.
+The datasets used in the examples can be downloaded [here](http://www.ehu.eus/ccwintco/index.php/Hyperspectral_Remote_Sensing_Scenes).
 
-	test_exp3.m: Experiments on metrics for different methods. You can pick tensor rank and multilinear ranks. Uses HySure results. Tables save automatically.
+For some of the experiments, the following packages need to be downloaded:
+ * [Codes for the STEREO method](https://github.com/marhar19/HSR_via_tensor_decomposition) for some  comparisons with comparisons with  the STEREO methods
+ * [HySure package](https://github.com/alfaiate/HySure/tree/master/src) for comparisons with HySure
+ * [Export Fig](https://www.mathworks.com/matlabcentral/fileexchange/23629-export_fig) to save some figures in PDF
 
-	test_exp4.m: Same experiments as test_exp1 but with HS-Pan fusion. Data and figure saves automatically.
-RUN ONE OF THESE TO GET RESULTS 
-
-../utils contains:
-	crop.m: crops data to the specified dimensions
-
-	gauss_kernel.m: Creates 1D gaussian filter with specified size and parameter sigma
-
-	solveC_normal.m: used in tenRec to solve C with normal equation
-
-	solveC_qr.m: used in tenRec to solve C with normal equation and QR factorization (for complexity purposes)
-
-	spatial_deg.m: generates P1 and P2 with specified downsampling ratio
-
-	spectral_deg.m: generates Pm from specified sensor (Landsat or Quickbird)
-
-../methods contains:
-	run_hosvd.m: runs HOSVD algorithm, returns estimated SRI and cell array of metrics
-
-	run_sdf.m: runs HOSVD with optimization by the corresponding TensorLab model; returns estimated SRI and cell array of metrics
-
-	stereo.m: STEREO algorithm as specified in the HSR paper (Sidiropoulos et. al.)
-
-	tenRec.m: initialization for STEREO algorithm as specified in the HSR paper (Sidiropoulos et. al.)
-
-../metrics contains:
-	cc.m: cross-correlation
-
-	ergas.m: global relative error
-
-	nmse.m: normalized mean square error
-
-	r_snr.m: signal-to-noise ration
-
-	sam.m: spectral angle mapper
-BETWEEN GROUNDTRUTH SRI AND ESTIMATE
+## Contents
+ * `src` contains the source codes for the methods
+ * `demos` contains the codes for the reproducivle examples
+ 
