@@ -74,5 +74,5 @@ methods = {'STEREO' 'stereo3' '50' []; ...
            'B-SCOTT' 'bscott_b1_adaptor' '[40,40,6]' []; ...   
            'HySure','hysure_b1_adaptor','[]',6};      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
-res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods); 
-T = cell2mat(res(:,2:end)); save('exp3_table2_sal.txt','T','-ASCII')
+res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods) 
+%T = cell2mat(res(:,2:end)); save('exp3_table2_sal.txt','T','-ASCII')

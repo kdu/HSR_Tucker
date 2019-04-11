@@ -31,26 +31,30 @@ end
 [V, ~, ~] = svds(tens2mat(MSI,2,[]),R(2));
 [W, ~, ~] = svds(tens2mat(HSI,3,[]), R(3));
 
-if R(1)>size(HSI,1)
-    A = kron(U'*(P1'*P1)*U);
-    B = kron(eye(R(3)), V'*(P2'*P2)*V);
+P1 = sparse(P1); P2 = sparse(P2); Pm = sparse(Pm);
+U_tilde = P1*U; V_tilde = P2*V; W_tilde = Pm*W;
+
+if (R(1)>size(HSI,1)||R(2)>size(HSI,2))
+    A = U_tilde'*U_tilde;
+    B = kron(eye(R(3)), V_tilde'*V_tilde);
     C = eye(R(1));
-    D = kron(opts.lambda* W'*(Pm'*Pm)*W, eye(R(2)));
-    b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+    D = kron(opts.lambda*(W_tilde'*W_tilde), eye(R(2)));
+    b_old = tmprod(HSI,{U_tilde', V_tilde', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W_tilde'},[1,2,3]);
     E = reshape(b_old, R(1),R(2)*R(3));
     if R(3) > size(MSI, 3)
       S = reshape(bartelsStewart(A,B,C,D,E),R);
     else
      S = reshape(bartelsStewart(C,D,A,B,E),R);
     end 
-elseif R(1)<=size(HSI,1)
-    A = kron(V'*(P2'*P2)*V, U'*(P1'*P1)*U);
+else
+    A = kron(V_tilde'*V_tilde, U_tilde'*U_tilde);
     A = A+ opts.alpha*norm(A,2)^2*ones(size(A,2));
-    B = opts.lambda* W'*(Pm'*Pm)*W;
+    B = opts.lambda*(W_tilde'*W_tilde);
     B = B+ opts.alpha*norm(A,2)^2*ones(size(B,2));
-    b_old = tmprod(HSI,{U'*P1', V'*P2', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W'*Pm'},[1,2,3]);
+    b_old = tmprod(HSI,{U_tilde', V_tilde', W'},[1,2,3]) + opts.lambda * tmprod(MSI,{U', V', W_tilde'},[1,2,3]);
     C = reshape(b_old, R(1)*R(2), R(3));
-    S = reshape(bartelsStewart(A,[],[],B,C), R);
+    %S = reshape(bartelsStewart(A,[],[],B,C), R);
+    S = reshape(sylvester(A,B,C), R);
 end
 
 SRI_hat = lmlragen({U,V,W},S);
