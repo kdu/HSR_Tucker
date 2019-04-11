@@ -9,13 +9,17 @@ function [res, est] = compare_methods(SRI, HSI, MSI, DegMat, ds, methods)
     if size(methods,2) > 3 && ~isempty(methods{i,4})
         if (methods{i,1} == "HySure")
             opt.p = methods{i,4};
-            blockstr = sprintf('p=%d', opt.p);
+            blockstr = sprintf('E = %d', opt.p);
         else
           opt.Nblocks = methods{i,4};
           blockstr = sprintf('(%d,%d) ', opt.Nblocks(1), opt.Nblocks(2)); 
         end
     end  
-    methname = sprintf('%s %s%s', methods{i,1}, blockstr, methods{i,3});
+    if (methods{i,1} == "HySure")
+        methname = sprintf('%s %s%s', methods{i,1}, blockstr);
+    else
+        methname = sprintf('%s %s%s', methods{i,1}, blockstr, methods{i,3});
+    end
     fprintf('Running method %s\n', methname);
     
     Params = sort(fieldnames(DegMat));  

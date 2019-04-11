@@ -28,7 +28,7 @@ methods = {'SCOTT' 'scott2' '[24,24,25]' [];...
            };      
 DegMat = struct('Pm', Pm, 'P1', P1, 'P2', P2);         
 res = compare_methods(SRI, HSI, MSI, DegMat, [d1 d2], methods)
-T = cell2mat(res(:,2:end)); save('exp4_table2_ip.txt','T','-ASCII')
+T = cell2mat(res(:,2:end)); save_results('exp4_table2_ip.txt',res)
 
 %% Run simulations
 
