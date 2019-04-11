@@ -12,10 +12,12 @@ d1 = 4; d2 = 4; q = 9;
 HSI = tmprod(tmprod(SRI,P1,1),P2,2);
 
 %% 
-F = 50;
+F = 50; opts.Niter = 1;
 
-tic; [SRI_hat1, ~] = stereo3( HSI, MSI, P1,P2,Pm, F); toc
-tic; [SRI_hat2, ~] = stereo4( HSI, MSI, P1,P2,Pm, F); toc
+disp('Our implementation:')
+[SRI_hat1, ~] = stereo3( HSI, MSI, P1,P2,Pm, F, opts); 
+disp('Kanatsoulis implementation:')
+[SRI_hat2, ~] = stereo4( HSI, MSI, P1,P2,Pm, F); 
 
 
     

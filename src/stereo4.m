@@ -11,7 +11,7 @@ else
 end
 
 lamda=1;
-s_iter=10; % same as us
+s_iter=2; % 10
 [ A1,B1,C1,~ ] = STEREO( HSI,MSI,P1,P2,Pm,s_iter,lamda,A,B,C,Pm*C);
 
 SRI_hat = cpdgen({A1,B1,C1});

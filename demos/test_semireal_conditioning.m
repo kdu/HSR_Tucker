@@ -46,7 +46,7 @@ figure % total condition of Kronecker product
 condXtX = ((sigmaU(1:minIJ_H,1).*sigmaV(1:minIJ_H,1)).^2 + s1W(K_M)^2) ./ ...
           ((sigmaU(1:minIJ_H,2).*sigmaV(1:minIJ_H,2)).^2);
 %semilogx(diff(log(condXtX)));
-plot(condXtX)
+semilogy(condXtX)
 xlabel('R_1 = R_2'); ylabel('$\mathrm{cond}({\bf X}^{\rm T} {\bf X}) $', 'Interpreter', 'latex')
 set(gcf, 'Position',  [100, 100, 200, 160])
 print2eps condIJ_Sal.eps
@@ -56,6 +56,13 @@ plot(6:25, s1W(6:25));
 xlabel('R_3'); ylabel('$\sigma_1({\bf P}_M \widehat{\bf W})$', 'Interpreter', 'latex')
 set(gcf, 'Position',  [100, 100, 200, 160])
 print2eps norm2_PmW_Sal.eps
+
+figure
+semilogx(diff(log(condXtX)));
+xlabel('R_1 = R_2'); ylabel('$\mathrm{diff}(\log(\mathrm{cond}({\bf X}^{\rm T} {\bf X}))) $', 'Interpreter', 'latex')
+set(gcf, 'Position',  [100, 100, 200, 160])
+print2eps diffcondIJ_Sal.eps
+
 
 % %% Plot individually (not included in the paper)
 % figure

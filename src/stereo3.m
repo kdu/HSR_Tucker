@@ -30,26 +30,34 @@ for n=1:opts.Niter
     %n 
     
     %disp('A...')
-    mat1 = (C'*C).*((P2*B)'*(P2*B));
-    mat2 = opts.lambda* (((Pm*C)'*(Pm*C)).*(B'*B));
-    Z = opts.lambda*Ym1'*kr(Pm*C,B) + P1'*Yh1'*kr(C,P2*B);
+    %tic;
+    C_tilde = Pm*C; B_tilde = P2*B;
+    mat1 = (C'*C).*(B_tilde'*B_tilde);
+    mat2 = opts.lambda* ((C_tilde'*C_tilde).*(B'*B));
+    Z = opts.lambda*Ym1'*kr(C_tilde,B) + P1'*Yh1'*kr(C,B_tilde);
     %A = bartelsStewart(P1'*P1, mat1', [], mat2',Z);
-    A = bartelsStewart(mat2, [], mat1, P1'*P1,Z'); A = A';
+    A = bartelsStewart(mat2, [], mat1, P1'*P1,Z'); A = A'; %toc;
     
     %disp('B...')
-     mat1 = (C'*C).*((P1*A)'*(P1*A));
-     mat2 = opts.lambda* (((Pm*C)'*(Pm*C)).*(A'*A));
-     Z = opts.lambda*Ym2'*kr(Pm*C,A) + P2'*Yh2'*kr(C,P1*A);
+    %tic;
+    A_tilde = P1*A;
+     mat1 = (C'*C).*(A_tilde'*A_tilde);
+     mat2 = opts.lambda* ((C_tilde'*C_tilde).*(A'*A));
+     Z = opts.lambda*Ym2'*kr(C_tilde,A) + P2'*Yh2'*kr(C,A_tilde);
      %B = bartelsStewart(P2'*P2, mat1', [], mat2',Z);
-     B = bartelsStewart(mat2, [], mat1, P2'*P2,Z'); B = B';
+     B = bartelsStewart(mat2, [], mat1, P2'*P2,Z'); B = B'; %toc;
      
     %disp('C...')
+    B_tilde = P2*B;
+    disp('Computing KR products'); tic;
     mat1 = (B'*B).*(A'*A);
-    mat2 = ((P2*B)'*(P2*B)).*((P1*A)'*(P1*A));
-    Z = opts.lambda*Pm'*Ym3'*kr(B,A) + Yh3'*kr(P2*B,P1*A);
+    mat2 = (B_tilde'*B_tilde).*(A_tilde'*A_tilde); toc
+    disp('Computing Z'); tic;
+    Z = opts.lambda*Pm'*Ym3'*kr(B,A) + Yh3'*kr(B_tilde,A_tilde); toc
     %C = bartelsStewart(lambda*(Pm'*Pm), mat1', [], mat2',Z);
-    C = bartelsStewart(mat2, [], mat1, opts.lambda*Pm'*Pm,Z'); C = C';
-    
+    disp('Solving equation'); tic;
+    %C = bartelsStewart(mat2, [], mat1, opts.lambda*Pm'*Pm,Z'); C = C'; toc
+    C = bartelsStewart(eye(size(HSI,3)), mat2, opts.lambda*Pm'*Pm, mat1, Z); toc
      
 
 end
